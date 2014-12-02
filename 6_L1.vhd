@@ -36,6 +36,13 @@ architecture structural of L1 is
       );
     end component;
     
+component shifter_512 is
+	port (
+		x: 	in std_logic_vector(511 downto 0); -- 535-bit input data
+		y: 	in std_logic_vector(5 downto 0);  -- Position to be shifted (activate with 1)
+		z: 	out std_logic_vector(511 downto 0) -- Output
+	);
+end component;
 
 component cmp_n is
   generic (
@@ -56,11 +63,11 @@ end component;
 
     signal tag_L1, current_data_tag_mem: std_logic_vector (21 downto 0);
     signal index_L1: std_logic_vector ( 3 downto 0);
-    signal offset_L1: std_logic_vector ( 5 downto 0);
+    signal offset_L1, offset_inv: std_logic_vector ( 5 downto 0);
     
     signal WrEn_L1, tag_match, h0, h1, miss, current_dirty_status: std_logic;
-    signal L1_Block_Out, L1_Block_In, L1_hit_block_In : std_logic_vector ( 534 downto 0);
-    signal m0, m1, m2, m3, L1_hit_block_In_wdt : std_logic_vector ( 511 downto 0);
+    signal L1_Block_Out, L1_Block_In, L1_hit_block_In  : std_logic_vector ( 534 downto 0);
+    signal m0, m1, m2, m3, s1, s0, L1_hit_block_In_wdt, L1_Block_shifted : std_logic_vector ( 511 downto 0);
     
     
 begin 
@@ -87,13 +94,21 @@ hitmap2: or_gate port map ( h0, h1, WrEn_L1);
 
 --Get Data_In in right offset position for data write
 
-L1_shift_535_map0: shifter_535 port map ( offset_L1, Data_In, m0);
-L1_shift_535_map1: shifter_535 port map ( offset_L1, "11111111111111111111111111111111", m1);
-not_mask_map: not_gate_n generic map (n=>535); port map ( m1, m2 );
-and_map_L1: and_gate_n generic map (n=>525); port map (m2, L1_Data_Out, m3);
-or_map_L1: or_gate_n generic map (n=>535); port map (m3, m0, L1_hit_block_In_wdt);
-L1_hit_block_In <= '1' &  tag_In & L1_hit_block_In_wdt;
+s0 <= "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000" & Data_In;
+s1 <= "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000" & "11111111111111111111111111111111";
 
-L1_data_in_mux_map: mux_n generic map (n => 535) port map ( hit, L2_Block_In, L1_hit_block_in, L1_Block_In);
+L1_shift_535_map0: shifter_512 port map ( s0, offset_L1, m0);
+L1_shift_535_map1: shifter_512 port map ( s1, offset_L1, m1);
+not_mask_map: not_gate_n generic map (n=>535) port map ( m1, m2 );
+and_map_L1: and_gate_n generic map (n=>525) port map (m2, L1_Block_Out, m3);
+or_map_L1: or_gate_n generic map (n=>535) port map (m3, m0, L1_hit_block_In_wdt);
+L1_hit_block_In <= '1' & tag_L1 & L1_hit_block_In_wdt;
+
+L1_data_in_mux_map: mux_n generic map (n => 535) port map ( tag_match, L2_Block_In, L1_hit_block_in, L1_Block_In);
+
+offset_inv_map: not_gate_n generic map ( n=> 6) port map (offset_L1, offset_inv);
+L1_shifter_map3: shifter_512 port map ( L1_Block_Out(511 downto 0), offset_inv, L1_Block_shifted);
+hit <= tag_match;
+Data_Out <= L1_Block_shifted(511 downto 480);
 
 end architecture structural; 
