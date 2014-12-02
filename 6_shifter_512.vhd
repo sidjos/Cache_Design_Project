@@ -6,7 +6,7 @@ use work.eecs361.all;
 
 entity shifter_512 is
 	port (
-		x: 	in std_logic_vector(511 downto 0); -- 535-bit input data
+		x: 	in std_logic_vector(511 downto 0); -- 512-bit input data
 		y: 	in std_logic_vector(5 downto 0);  -- Position to be shifted (activate with 1)
 		z: 	out std_logic_vector(511 downto 0) -- Output
 	);
