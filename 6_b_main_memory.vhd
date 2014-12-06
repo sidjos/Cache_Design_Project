@@ -44,7 +44,7 @@ begin
    
    
    --main memory 
-   syncram_map:	syncram generic (mem_file : string);
+   syncram_map:	syncram (mem_file => "sort_corrected_branch.dat")
    		port map (clk=>, cs=>1, oe=>1, we=>0, 
    			  addr(31 downto 10)=>addr(31 downto 10), addr(9 downto 0)=>B"0000000000", 
    			  din=>B"00000000000000000000000000000000", dout=>syncram0);
