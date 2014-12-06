@@ -7,12 +7,13 @@ use work.eecs361.all;
 entity main_memory is
 	generic ( memfile_s: string);
 	port (
-		clk     in std_logic; 
-		rst	in std_logic; 
-		addr	in std_logic_vector(31 downto 0); 
-		x: 	in std_logic_vector(511 downto 0); -- 512-bit input data
-		y: 	in std_logic_vector(5 downto 0);  -- Position to be shifted (activate with 1)
-		z: 	out std_logic_vector(511 downto 0); -- Output
+		clk:     in std_logic; 
+		reset:	in std_logic; 
+		address:	in std_logic_vector(31 downto 0); 
+		L2_Miss: in std_logic;
+		write: in std_logic;
+		data_in: in std_logic_vector (31 downto 0);
+		data_in_buffer: in std_logic_vector ( 63 downto 0);
 		data_valid: out std_logic;
 		data_out: out std_logic_vector(2047 downto 0)
 	);
