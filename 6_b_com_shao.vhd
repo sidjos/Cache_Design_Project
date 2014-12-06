@@ -4,27 +4,51 @@ use ieee.numeric_std.all;
 use work.eecs361_gates.all;
 use work.eecs361.all;
 
-entity shifter_512 is
+entity 6_b_com_shao is
 	port (
-		x: 	in std_logic_vector(511 downto 0); -- 512-bit input data
-		y: 	in std_logic_vector(5 downto 0);  -- Position to be shifted (activate with 1)
-		z: 	out std_logic_vector(511 downto 0) -- Output
+		input_0: 	in std_logic_vector(2069 downto 0); -- 22-bit tag + 256 bytes
+		input_1: 	in std_logic_vector(2069 downto 0); 
+		input_2: 	in std_logic_vector(2069 downto 0); 
+		input_3:	in std_logic_vector(2069 downto 0);
+		tag:		in std_logic_vector(21 downto 0);
+		output:		out std_logic_vector(2069 downto 0);
+		hit:		out std_logic
 	);
-end shifter_512;
+end 6_b_com_shao;
 
-architecture structural of shifter_535 is
+architecture structural of 6_b_com_shao is
 
-signal mux0: std_logic_vector(511 downto 0);
-signal mux1: std_logic_vector(511 downto 0);
+signal mux0: std_logic_vector(2069 downto 0);
+signal mux1: std_logic_vector(2069 downto 0);
 signal mux2: std_logic_vector(511 downto 0);
-signal mux3: std_logic_vector(511 downto 0);
+
+
+signal com0: std_logic;
+signal com1: std_logic;
+signal com2: std_logic;
+signal com3: std_logic;
+
+signal or0: std_logic;
+signal or1: std_logic;
+signal or2: std_logic;
 
 begin
-    
-	mux0_map:	mux_n generic map (n=>512)	 port map (sel=>y(5), src0=>x, src1(511 downto 256)=>x(255 downto 0), src1(255 downto 0)=>B"0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000", z=>mux0);
-	mux1_map:	mux_n generic map (n=>512)	 port map (sel=>y(4), src0=>mux0, src1(511 downto 128)=>mux0(383 downto 0),src1(127 downto 0)=>B"00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000", z=>mux1);
-	mux2_map:	mux_n generic map (n=>512)	 port map (sel=>y(3), src0=>mux1, src1(511 downto 64)=>mux1(447 downto 0),src1(63 downto 0)=>B"0000000000000000000000000000000000000000000000000000000000000000", z=>mux2);
-   mux3_map:	mux_n generic map (n=>512)	 port map (sel=>y(2), src0=>mux2, src1(511 downto 32)=>mux2(479 downto 0),src1(31 downto 0)=>B"00000000000000000000000000000000", z=>mux3);
+    	--compare tag
+    	com0_map:	com_n generic map (n=>22)	 port map (a=>input_0(2069 downto 2048), b=>tag, a_eq_b=>com0);
+    	com1_map:	com_n generic map (n=>22)	 port map (a=>input_1(2069 downto 2048), b=>tag, a_eq_b=>com1);
+    	com2_map:	com_n generic map (n=>22)	 port map (a=>input_2(2069 downto 2048), b=>tag, a_eq_b=>com2);
+    	com3_map:	com_n generic map (n=>22)	 port map (a=>input_3(2069 downto 2048), b=>tag, a_eq_b=>com3);
+    	
+    	--hit
+    	or0_map:	or_gate 			 port map (x=>com0,y=>com1,z=>or0);
+    	or1_map:	or_gate 			 port map (x=>com2,y=>com3,z=>or1);
+    	or1_map:	or_gate 			 port map (x=>com2,y=>com3,z=>hit);
+    	
+    	--output 
+	mux0_map:	mux_n generic map (n=>2070)	 port map (sel=>com1, src0=>input_0, src1=>input_1, z=>mux0);
+	mux1_map:	mux_n generic map (n=>2070)	 port map (sel=>com2, src0=>input_2, src1=>input_3, z=>mux1);
+	and0_map:	or_gate			 	 port map (x=>com2, y=>com3, z=>or2);
+	mux2_map:	mux_n generic map (n=>2070)	 port map (sel=>and0, src0=>mux0, src1=>mux1, z=>output);
 	
 end architecture structural;
 
