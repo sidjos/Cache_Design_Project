@@ -35,3 +35,7 @@ l1_miss_cnt : out std_logic_vector(31 downto 0);
 l1_evict_cnt : out std_logic_vector(31 downto 0)
 );
 end memory_hierarchy;
+
+architecture structual of memory_heirarchy is
+    
+    

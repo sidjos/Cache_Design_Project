@@ -16,15 +16,22 @@ end syncboss;
 
 architecture structural of syncboss is
     
-    signal q0, q0b, q1, q1b, d0, d1 : std_logic;
+    component and_gate_3to1_s is
+      port (
+        x_0, x_1, x_2    : in std_logic;
+        z    : out std_logic
+      );
+    end component;
+    
+    signal q0, q0b, q1, q1b, d0, d1, s0, s1 : std_logic;
     
     begin
         
-        m0: and_gate_n generic map( n=>3) port map (q0b, q1, b, s0);
-        m1: and_gate_n generic map (n=>3) port map (q0, q1b, b, s1);
+        m0: and_gate_3to1_s port map (q0b, q1, b, s0);
+        m1: and_gate_3to1_s  port map (q0, q1b, b, s1);
         m2: or_gate port map ( s0, s1, d0);
-        m3: dff port map ( clk, do, q0);
-        m4: and_gate_n generic map ( n=> 3) port map (q0b, q1b, b, d1);
+        m3: dff port map ( clk, d0, q0);
+        m4: and_gate_3to1_s port map (q0b, q1b, b, d1);
         m6: dff port map ( clk, d1, q1);
         m7: and_gate port map (q0b, q1, sync);
         m8: not_gate port map (q0, q0b);
