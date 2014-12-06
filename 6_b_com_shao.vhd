@@ -18,19 +18,8 @@ end tag_L2_compare;
 
 architecture structural of tag_L2_compare is
 
-signal mux0: std_logic_vector(2069 downto 0);
-signal mux1: std_logic_vector(2069 downto 0);
-signal mux2: std_logic_vector(511 downto 0);
-
-
-signal com0: std_logic;
-signal com1: std_logic;
-signal com2: std_logic;
-signal com3: std_logic;
-
-signal or0: std_logic;
-signal or1: std_logic;
-signal or2: std_logic;
+signal mux0,mux1,mux2: std_logic_vector(2069 downto 0);
+signal com0,com1,com2,com3,or0,or1,or2: std_logic;
 
 begin
     	--compare tag
