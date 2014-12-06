@@ -32,7 +32,7 @@ begin
 
    generate_memory0: for i in 0 to 31 generate
    map_memory_reg0: dffr_a port map (clk=>clk, arst=>'0',aload=>rst, adata=>'0', d=>fulladder0(i), enable=>'1',q=>pc0(i));
-   end generate_memoey0;
+   end generate_memory0;
    
    	
    --main memory 
@@ -63,7 +63,7 @@ begin
    
    generate_memory1: for i in 0 to 2047 generate
    map_memory_reg1: dffr_a port map (clk=>not_clk, arst=>'0',aload=>rst, adata=>'0', d=>fulladder1(i), enable=>'1',q=>data_out(i));
-   end generate_memoey1;
+   end generate_memory1;
    
 end architecture structural;
 
