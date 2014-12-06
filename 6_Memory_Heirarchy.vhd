@@ -38,4 +38,115 @@ end memory_hierarchy;
 
 architecture structual of memory_heirarchy is
     
-    
+component L1 is 
+   port 
+       (
+       Data_In: in std_logic_vector ( 31 downto 0);
+       L2_Block_In : in std_logic_vector (511 downto 0);
+       Address: in std_logic_vector ( 31 downto 0);
+       Write_Enable: in std_logic;
+       Data_Valid_L2: in std_logic;
+       Enable: in std_logic;
+       clk  : in std_logic;
+       Hit : out std_logic;
+       Data_Out: out std_logic_vector ( 31 downto 0)
+       );
+end L1;
+
+component L2 is 
+   port 
+       (
+       Data_In: in std_logic_vector ( 31 downto 0);
+       Memory_Block_In : in std_logic_vector (2069 downto 0);
+       Address: in std_logic_vector ( 31 downto 0);
+       Write_Enable: in std_logic;
+       Memory_Block_Data_Valid: in std_logic;
+       Data_Valid_L2: out std_logic;
+       Enable: in std_logic;
+       clk  : in std_logic;
+       L2_Hit : out std_logic;
+       L2_Data_Out: out std_logic_vector ( 511 downto 0)
+       );
+end L2;
+
+component main_memory is
+	generic ( memfile_s: string);
+	port (
+		rst	in std_logic; 
+		addr	in std_logic_vector(31 downto 0); 
+		x: 	in std_logic_vector(511 downto 0); -- 512-bit input data
+		y: 	in std_logic_vector(5 downto 0);  -- Position to be shifted (activate with 1)
+		z: 	out std_logic_vector(511 downto 0); -- Output
+		data_valid: out std_logic
+	);
+end main_memory;
+
+component syncboss is 
+port(
+    clk     : in std_logic;
+    b: in std_logic;
+    sync: out std_logic
+    );
+end syncboss;
+
+begin
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+L1_map: L1 
+   port map
+       (
+       Data_In: DataIn;
+       L2_Block_In : in std_logic_vector (511 downto 0);
+       Address: Addr;
+       Write_Enable: WR;
+       Data_Valid_L2: in std_logic;
+       Enable: EN;
+       clk  : clk;
+       Hit : L1_Hit;
+       Data_Out: DataOut
+       );
+end L1;
+
+L2_map: L2 port map 
+       (
+       Data_In: DataIn;
+       Memory_Block_In : Memory_Block_In (2069 downto 0);
+       Address: Addr;
+       Write_Enable: WR;
+       Memory_Block_Data_Valid: in std_logic;
+       Data_Valid_L2: Data_Valid_L2;
+       Enable: in std_logic;
+       clk  : in std_logic;
+       L2_Hit : out std_logic;
+       L2_Data_Out: out std_logic_vector ( 511 downto 0)
+       );
+end L2;
+
+component main_memory is
+	generic ( memfile_s: string);
+	port (
+		rst	in std_logic; 
+		addr	in std_logic_vector(31 downto 0); 
+		x: 	in std_logic_vector(511 downto 0); -- 512-bit input data
+		y: 	in std_logic_vector(5 downto 0);  -- Position to be shifted (activate with 1)
+		z: 	out std_logic_vector(511 downto 0); -- Output
+		data_valid: out std_logic
+	);
+end main_memory;
