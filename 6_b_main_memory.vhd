@@ -33,7 +33,7 @@ signal not0: std_logic;
 begin
     
    	--counter
-	fulladder_map: fulladder_32 (cin=>'0', x=>pc0, y=>B"00000000000000000000000000000001", z=>mux6);
+	fulladder_map:  fulladder_32 port map (cin=>'0', x=>pc0, y=>B"00000000000000000000000000000001", z=>mux6);
    
    	not0_map:	not_gate port map (x=>clk,z=>not_clk);
    
