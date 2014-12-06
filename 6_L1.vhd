@@ -14,6 +14,7 @@ entity L1 is
        Address: in std_logic_vector ( 31 downto 0);
        Write_Enable: in std_logic;
        Data_Valid_L2: in std_logic;
+       Enable: in std_logic;
        clk  : in std_logic;
        Hit : out std_logic;
        Data_Out: out std_logic_vector ( 31 downto 0)
@@ -21,22 +22,7 @@ entity L1 is
 end L1;
        
 architecture structural of L1 is 
- 
- component csram is
-      generic (
-        INDEX_WIDTH : integer;
-        BIT_WIDTH : integer
-      );
-      port (
-       cs	  : in	std_logic;
-       oe	  :	in	std_logic;
-       we	  :	in	std_logic;
-       index : in	std_logic_vector(INDEX_WIDTH-1 downto 0);
-       din	  :	in	std_logic_vector(BIT_WIDTH-1 downto 0);
-       dout  :	out std_logic_vector(BIT_WIDTH-1 downto 0)
-      );
-    end component;
-    
+
 component shifter_512 is
 	port (
 		x: 	in std_logic_vector(511 downto 0); -- 535-bit input data
@@ -45,28 +31,11 @@ component shifter_512 is
 	);
 end component;
 
-component cmp_n is
-  generic (
-    n : integer
-  );
-  port (
-    a      : in std_logic_vector(n-1 downto 0);
-    b      : in std_logic_vector(n-1 downto 0);
-
-    a_eq_b : out std_logic;
-    a_gt_b : out std_logic;
-    a_lt_b : out std_logic;
-
-    signed_a_gt_b : out std_logic;
-    signed_a_lt_b : out std_logic
-  );
-end component;
-
     signal tag_L1, current_data_tag_mem: std_logic_vector (21 downto 0);
     signal index_L1: std_logic_vector ( 3 downto 0);
     signal offset_L1, offset_inv: std_logic_vector ( 5 downto 0);
     
-    signal WrEn_L1, tag_match, h0, h1, miss, current_dirty_status: std_logic;
+    signal WrEn_L1, WrEn_L1_pc, tag_match, h0, h1, miss, current_dirty_status: std_logic;
     signal L1_Block_Out, L1_Block_In, L1_hit_block_In  : std_logic_vector ( 534 downto 0);
     signal m0, m1, m2, m3, s1, s0, L1_hit_block_In_wdt, L1_Block_In_wdt, L1_Block_shifted : std_logic_vector ( 511 downto 0);
     
@@ -92,8 +61,9 @@ miss_sig_map: not_gate port map (tag_match, miss);
 --When to write
 hitmap0: and_gate port map ( miss, Data_Valid_L2, h0);
 hitmap1: and_gate port map ( tag_match, Write_Enable, h1);
-hitmap2: or_gate port map ( h0, h1, WrEn_L1);
---WrEn_L1 means we have to write
+hitmap2: or_gate port map ( h0, h1, WrEn_L1_pc);
+clockingL1_write: dffr_a port map (clk, Enable, '0', '0', WrEn_L1_pc, '1', WrEn_L1);
+--WrEn_L1 means we have to write to L1
 
 --Get Data_In in right offset position for data write
 
@@ -110,6 +80,7 @@ or_map_L1: or_gate_n generic map (n=>512) port map (m3, m0, L1_hit_block_In_wdt)
 L1_data_in_mux_map: mux_n generic map (n => 535) port map ( tag_match, L2_Block_In, L1_hit_block_in_wdt, L1_Block_In_wdt);
 L1_Block_In <= '1' & tag_L1 & L1_Block_In_wdt;
 
+--Get the 32 bit data from 64 byte data
 offset_inv_map: not_gate_n generic map ( n=> 6) port map (offset_L1, offset_inv);
 L1_shifter_map3: shifter_512 port map ( L1_Block_Out(511 downto 0), offset_inv, L1_Block_shifted);
 

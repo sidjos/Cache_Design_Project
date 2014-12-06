@@ -10,33 +10,20 @@ entity L2 is
    port 
        (
        Data_In: in std_logic_vector ( 31 downto 0);
-       Memory_Block_In : in std_logic_vector (1023 downto 0);
+       Memory_Block_In : in std_logic_vector (2069 downto 0);
        Address: in std_logic_vector ( 31 downto 0);
        Write_Enable: in std_logic;
+       Memory_Block_Data_Valid: in std_logic;
        Data_Valid_L2: out std_logic;
+       Enable: in std_logic;
        clk  : in std_logic;
        L2_Hit : out std_logic;
        L2_Data_Out: out std_logic_vector ( 511 downto 0)
        );
-end L1;
+end L2;
 
-architecture structural of L1 is 
- 
- component csram is
-      generic (
-        INDEX_WIDTH : integer;
-        BIT_WIDTH : integer
-      );
-      port (
-       cs	  : in	std_logic;
-       oe	  :	in	std_logic;
-       we	  :	in	std_logic;
-       index : in	std_logic_vector(INDEX_WIDTH-1 downto 0);
-       din	  :	in	std_logic_vector(BIT_WIDTH-1 downto 0);
-       dout  :	out std_logic_vector(BIT_WIDTH-1 downto 0)
-      );
-    end component;
-    
+architecture structural of L2 is 
+
 component shifter_512 is
 	port (
 		x: 	in std_logic_vector(511 downto 0); -- 535-bit input data
@@ -57,53 +44,55 @@ component tag_L2_compare is
 	);
 end component;
 
-component cmp_n is
-  generic (
-    n : integer
-  );
-  port (
-    a      : in std_logic_vector(n-1 downto 0);
-    b      : in std_logic_vector(n-1 downto 0);
-
-    a_eq_b : out std_logic;
-    a_gt_b : out std_logic;
-    a_lt_b : out std_logic;
-
-    signed_a_gt_b : out std_logic;
-    signed_a_lt_b : out std_logic
-  );
-end component;
-
-    signal tag_L1, current_data_tag_mem: std_logic_vector (21 downto 0);
-    signal index_L1: std_logic_vector ( 3 downto 0);
-    signal offset_L1, offset_inv: std_logic_vector ( 5 downto 0);
+    signal tag_L2 : std_logic_vector (21 downto 0);
+    signal index_L2: std_logic_vector ( 1 downto 0);
+    signal offset_L2, offset_inv: std_logic_vector ( 7 downto 0);
     
-    signal WrEn_L1, tag_match, h0, h1, miss, current_dirty_status: std_logic;
-    signal L2_Block_Out, L2_Block_In  : std_logic_vector ( 534 downto 0);
+    signal WrEn_L2, WrEn_L2_s0_pc, WrEn_L2_s1_pc, WrEn_L2_s2_pc, WrEn_L2_s3_pc, WrEn_L2_s0, WrEn_L2_s1, WrEn_L2_s2, WrEn_L2_s3, L2_tag_match, h0, h1, L2_miss: std_logic;
+    signal L2_Block_Out_s0, L2_Block_Out_s1, L2_Block_Out_s2, L2_Block_Out_s3, tag, L2_block_Out, L2_Block_In  : std_logic_vector ( 2069 downto 0);
  --   signal m0, m1, m2, m3, s1, s0, L1_hit_block_In_wdt, L1_Block_In_wdt, L1_Block_shifted : std_logic_vector ( 511 downto 0);
     
     
 begin 
 
-tag_L1 <= Address ( 31 downto 10);
-index_L1 <= Address (9 downto 6);
-offset_L1 <= Address (5 downto 0);
+tag_L2 <= Address ( 31 downto 10);
+index_L2 <= Address (9 downto 8);
+offset_L2 <= Address (7 downto 0);
 
-L2_csram: csram generic map ( INDEX_WIDTH => 4, BIT_WIDTH =>  )
-                port map ( cs => '1', oe => '1', we => WrEn_L1, index => index_L1, din => L1_Block_In, dout => L1_Block_Out);
+L2_csram_s0: csram generic map ( INDEX_WIDTH => 2, BIT_WIDTH => 2070 )
+                port map ( cs => '1', oe => '1', we => WrEn_L2_s0, index => index_L2, din => L2_Block_In, dout => L2_Block_Out_s0);
+                    
+L2_csram_s1: csram generic map ( INDEX_WIDTH => 2, BIT_WIDTH => 2070 )
+                port map ( cs => '1', oe => '1', we => WrEn_L2_s1, index => index_L2, din => L2_Block_In, dout => L2_Block_Out_s1);
+                    
+L2_csram_s2: csram generic map ( INDEX_WIDTH => 2, BIT_WIDTH => 2070 )
+                port map ( cs => '1', oe => '1', we => WrEn_L2_s2, index => index_L2, din => L2_Block_In, dout => L2_Block_Out_s2);
 
-current_data_tag_mem <= L1_Block_Out(533 downto 512);
-current_dirty_status <= L1_Block_Out(534);
-Comparator_L1: cmp_n generic map ( n => 22 )
-                     port map ( a => current_data_tag_mem, b => tag_L1, a_eq_b => tag_match); 
+L2_csram_s3: csram generic map ( INDEX_WIDTH => 2, BIT_WIDTH => 2070 )
+                port map ( cs => '1', oe => '1', we => WrEn_L2_s3, index => index_L2, din => L2_Block_In, dout => L2_Block_Out_s3);
+
+
+--Comparators
+
+L2_output_current: tag_L2_compare port map ( L2_Block_Out_s0, L2_Block_Out_s1, L2_Block_Out_s2, L2_Block_Out_s3, tag_L2, L2_block_Out, L2_tag_match);
+miss_sig_map_L2: not_gate port map (L2_tag_match, L2_miss);
+
 --output
-hit <= tag_match;
-
-miss_sig_map: not_gate port map (tag_match, miss);
+L2_hit <= L2_tag_match;
 
 --When to write
-hitmap0: and_gate port map ( miss, Data_Valid_L2, h0);
-hitmap1: and_gate port map ( tag_match, Write_Enable, h1);
-hitmap2: or_gate port map ( h0, h1, WrEn_L1);
---WrEn_L1 means we have to write
+hitmap0: and_gate port map ( L2_miss, Memory_Block_Data_Valid, h0);
+hitmap1: and_gate port map ( L2_tag_match, Write_Enable, h1);
+hitmap2: or_gate port map ( h0, h1, WrEn_L2);
+--WrEn_L2 means we have to write L2 memory
 
+--Where to write
+WrEn_L2_s0_pc <= WrEn_L2; -- have to implement LRU
+
+--Clocking Write
+clockingL2_write: dffr_a port map (clk, Enable, '0', '0', WrEn_L2_s0_pc, '1', WrEn_L2_s0);
+
+--What to write
+L2_Block_In <= Memory_Block_In; --implment mux
+
+end structural; 
