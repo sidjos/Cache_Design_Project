@@ -36,7 +36,7 @@ l1_evict_cnt: out std_logic_vector(31 downto 0)
 );
 end memory_hierarchy;
 
-architecture structual of memory_heirarchy is
+architecture structural of memory_hierarchy is
     
 component L1 is 
    port 
@@ -48,7 +48,8 @@ component L1 is
        Data_Valid_L2: in std_logic;
        Enable: in std_logic;
        clk: in std_logic;
-       Hit: out std_logic;
+       L1_Hit: out std_logic;
+       L1_Miss: out std_logic;
        Data_Out: out std_logic_vector ( 31 downto 0)
        );
 end L1;
@@ -65,6 +66,7 @@ component L2 is
        Enable: in std_logic;
        clk: in std_logic;
        L2_Hit: out std_logic;
+       L2_Miss: out std_logic;
        L2_Data_Out: out std_logic_vector ( 511 downto 0)
        );
 end L2;
@@ -93,7 +95,7 @@ port(
 end syncboss;
 
 signal L2_Block_Out: std_logic_vector ( 511 downto 0);
-signal L2_Data_Valid, memory_data_valid, L2_Hitm L1_Hit, L1_Miss, L2_Miss: std_logic; 
+signal L2_Data_Valid, memory_data_valid, L2_Hit, L1_Hit, L1_Miss, L2_Miss, L1_Hit_sync, L1_Miss_sync, L2_Miss_sync, L2_Hit_sync: std_logic; 
 signal Memory_Block_In: std_logic_vector (2069 downto 0);
 
 
@@ -125,10 +127,10 @@ L2_map: L2 port map(
        Data_In => DataIn,
        Memory_Block_In=>Memory_Block_In ,
        Address=>Addr,
-       Write_Enable: WR,
+       Write_Enable=> WR,
        Memory_Block_Data_Valid=>memory_data_valid,
        Data_Valid_L2=>L2_Data_Valid,
-       Enable=>EN;
+       Enable=>EN,
        clk =>clk,
        L2_Hit=>L2_Hit,
        L2_Miss=>L2_Miss,
@@ -147,3 +149,5 @@ mainMemoryMap: main_memory generic map ( memfile_s: mem_file );
 		data_valid=>	memory_data_valid,
 		data_out=>	memory_data_out
 	);
+
+end structural;
