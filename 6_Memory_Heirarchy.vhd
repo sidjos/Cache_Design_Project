@@ -52,7 +52,7 @@ component L1 is
        L1_Miss: out std_logic;
        Data_Out: out std_logic_vector ( 31 downto 0)
        );
-end L1;
+end component;
 
 component L2 is 
    port 
@@ -69,7 +69,7 @@ component L2 is
        L2_Miss: out std_logic;
        L2_Data_Out: out std_logic_vector ( 511 downto 0)
        );
-end L2;
+end component;
 
 component main_memory is
 	generic ( memfile_s: string);
@@ -92,7 +92,7 @@ port(
     b: in std_logic;
     sync: out std_logic
     );
-end syncboss;
+end component;
 
 signal L2_Block_Out: std_logic_vector ( 511 downto 0);
 signal L2_Data_Valid, memory_data_valid, L2_Hit, L1_Hit, L1_Miss, L2_Miss, L1_Hit_sync, L1_Miss_sync, L2_Miss_sync, L2_Hit_sync: std_logic; 
@@ -115,11 +115,11 @@ L1_map: L1 port map
        L2_Block_In=>L2_Block_Out,
        Address=>Addr,
        Write_Enable=>WR,
-       Data_Valid_L2=>std_logic,
+       Data_Valid_L2=>L2_Data_Valid,
        Enable=>EN,
        clk =>clk,
-       Hit=>L1_Hit,
-       Miss=> L1_Miss,
+       L1_Hit=>L1_Hit,
+       L1_Miss=> L1_Miss,
        Data_Out=>DataOut
        );
 
@@ -137,7 +137,7 @@ L2_map: L2 port map(
        L2_Data_Out=>L2_Block_Out
        );
 
-mainMemoryMap: main_memory generic map ( memfile_s: mem_file );
+mainMemoryMap: main_memory generic map ( memfile_s => mem_file );
 	port map (
 		clk=>    clk,
 		reset =>		EN,
