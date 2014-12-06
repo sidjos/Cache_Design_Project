@@ -101,23 +101,23 @@ begin
 
 
 ready_signal_map: syncboss port map (clk, L1_Hit, Ready);
-L1_Hit_Count: synchboss port map (clk, L1_Hit, L1_Hit_sync);
-L1_Hit_Count: synchboss port map (clk, L1_Miss, L1_Miss_sync);
-L2_Hit_Count: synchboss port map (clk, L2_Hit, L2_Hit_sync);
-L2_Hit_Count: synchboss port map (clk, L2_Miss, L2_Miss_sync);
+L1_Hit_Count_s: syncboss port map (clk, L1_Hit, L1_Hit_sync);
+L1_Miss_Count_s: syncboss port map (clk, L1_Miss, L1_Miss_sync);
+L2_Hit_Count_s: syncboss port map (clk, L2_Hit, L2_Hit_sync);
+L2_Miss_Count_s: syncboss port map (clk, L2_Miss, L2_Miss_sync);
 
 
 L1_map: L1 port map
        (
-       Data_In=>DataIn;
-       L2_Block_In=>L2_Block_Out;
-       Address=>Addr;
-       Write_Enable=>WR;
-       Data_Valid_L2=>std_logic;
-       Enable=>EN;
-       clk =>clk;
-       Hit=>L1_Hit;
-       Miss=> L1_Miss;
+       Data_In=>DataIn,
+       L2_Block_In=>L2_Block_Out,
+       Address=>Addr,
+       Write_Enable=>WR,
+       Data_Valid_L2=>std_logic,
+       Enable=>EN,
+       clk =>clk,
+       Hit=>L1_Hit,
+       Miss=> L1_Miss,
        Data_Out=>DataOut
        );
 

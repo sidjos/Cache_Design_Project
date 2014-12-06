@@ -79,9 +79,11 @@ not_mask_map: not_gate_n generic map (n=>512) port map ( m1, m2 );
 and_map_L1: and_gate_n generic map (n=>512) port map (m2, L1_Block_Out, m3);
 or_map_L1: or_gate_n generic map (n=>512) port map (m3, m0, L1_hit_block_In_wdt);
 
+
 --Choose the right source for data-in for L1 memory
-L1_data_in_mux_map: mux_n generic map (n => 535) port map ( tag_match, L2_Block_In, L1_hit_block_in_wdt, L1_Block_In_wdt);
+L1_data_in_mux_map: mux_n generic map (n => 512) port map ( tag_match, L2_Block_In, L1_hit_block_in_wdt, L1_Block_In_wdt);
 L1_Block_In <= '1' & tag_L1 & L1_Block_In_wdt;
+
 
 --Get the 32 bit data from 64 byte data
 offset_inv_map: not_gate_n generic map ( n=> 6) port map (offset_L1, offset_inv);
