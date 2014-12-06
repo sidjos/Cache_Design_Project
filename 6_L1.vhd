@@ -16,8 +16,8 @@ entity L1 is
        Data_Valid_L2: in std_logic;
        Enable: in std_logic;
        clk  : in std_logic;
-       Hit : out std_logic;
-       Miss : out std_logic;
+       L1_Hit : out std_logic;
+       L1_Miss : out std_logic;
        Data_Out: out std_logic_vector ( 31 downto 0)
        );
 end L1;
@@ -36,7 +36,7 @@ end component;
     signal index_L1: std_logic_vector ( 3 downto 0);
     signal offset_L1, offset_inv: std_logic_vector ( 5 downto 0);
     
-    signal WrEn_L1, WrEn_L1_pc, tag_match, h0, h1, current_dirty_status: std_logic;
+    signal WrEn_L1, WrEn_L1_pc, tag_match, tag_miss, h0, h1, current_dirty_status: std_logic;
     signal L1_Block_Out, L1_Block_In, L1_hit_block_In  : std_logic_vector ( 534 downto 0);
     signal m0, m1, m2, m3, s1, s0, L1_hit_block_In_wdt, L1_Block_In_wdt, L1_Block_shifted : std_logic_vector ( 511 downto 0);
     
@@ -55,12 +55,13 @@ current_dirty_status <= L1_Block_Out(534);
 Comparator_L1: cmp_n generic map ( n => 22 )
                      port map ( a => current_data_tag_mem, b => tag_L1, a_eq_b => tag_match); 
 --output
-hit <= tag_match;
+L1_Hit <= tag_match;
+L1_Miss <= tag_miss;
 
-miss_sig_map: not_gate port map (tag_match, Miss);
+miss_sig_map: not_gate port map (tag_match, tag_miss);
 
 --When to write
-hitmap0: and_gate port map ( miss, Data_Valid_L2, h0);
+hitmap0: and_gate port map ( tag_miss, Data_Valid_L2, h0);
 hitmap1: and_gate port map ( tag_match, Write_Enable, h1);
 hitmap2: or_gate port map ( h0, h1, WrEn_L1_pc);
 --clocking write
