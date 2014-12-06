@@ -18,6 +18,7 @@ entity L2 is
        Enable: in std_logic;
        clk  : in std_logic;
        L2_Hit : out std_logic;
+       L2_Miss: out std_logic;
        L2_Data_Out: out std_logic_vector ( 511 downto 0)
        );
 end L2;
@@ -48,8 +49,9 @@ end component;
     signal index_L2: std_logic_vector ( 1 downto 0);
     signal offset_L2, offset_inv: std_logic_vector ( 7 downto 0);
     
-    signal WrEn_L2, WrEn_L2_s0_pc, WrEn_L2_s1_pc, WrEn_L2_s2_pc, WrEn_L2_s3_pc, WrEn_L2_s0, WrEn_L2_s1, WrEn_L2_s2, WrEn_L2_s3, L2_tag_match, h0, h1, L2_miss: std_logic;
+    signal WrEn_L2, WrEn_L2_s0_pc, WrEn_L2_s1_pc, WrEn_L2_s2_pc, WrEn_L2_s3_pc, WrEn_L2_s0, WrEn_L2_s1, WrEn_L2_s2, WrEn_L2_s3, L2_tag_match, h0, h1 : std_logic;
     signal L2_Block_Out_s0, L2_Block_Out_s1, L2_Block_Out_s2, L2_Block_Out_s3, tag, L2_block_Out, L2_Block_In  : std_logic_vector ( 2069 downto 0);
+    signal m0, m1: std_logic_vector (2047 downto 0);
  --   signal m0, m1, m2, m3, s1, s0, L1_hit_block_In_wdt, L1_Block_In_wdt, L1_Block_shifted : std_logic_vector ( 511 downto 0);
     
     
@@ -80,19 +82,24 @@ miss_sig_map_L2: not_gate port map (L2_tag_match, L2_miss);
 --output
 L2_hit <= L2_tag_match;
 
+--Need to split L2_Block_Out
+muxL2_0: mux_n generic map (n=>2048) port map ( L2_Block_Out( 511 downto 0), L2_Block_Out( 1023 downto 512), m0);
+muxL2_1: mux_n generic map (n=>2048) port map ( L2_Block_Out( 1535 downto 1024), L2_Block_Out( 2047 downto 1536), m1);
+muxL2_2: mux_n generic map (n=>2048) port map ( m0, m1, L2_Data_Out);
+
+
 --When to write
 hitmap0: and_gate port map ( L2_miss, Memory_Block_Data_Valid, h0);
 hitmap1: and_gate port map ( L2_tag_match, Write_Enable, h1);
 hitmap2: or_gate port map ( h0, h1, WrEn_L2);
+--Clocking Write
+clockingL2_write: dffr_a port map (clk, Enable, '0', '0', WrEn_L2_s0_pc, '1', WrEn_L2_s0);
 --WrEn_L2 means we have to write L2 memory
 
 --Where to write
 WrEn_L2_s0_pc <= WrEn_L2; -- have to implement LRU
 
---Clocking Write
-clockingL2_write: dffr_a port map (clk, Enable, '0', '0', WrEn_L2_s0_pc, '1', WrEn_L2_s0);
-
 --What to write
-L2_Block_In <= Memory_Block_In; --implment mux
+L2_Block_In <= Memory_Block_In; --implement mux
 
 end structural; 

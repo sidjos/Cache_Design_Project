@@ -17,6 +17,7 @@ entity L1 is
        Enable: in std_logic;
        clk  : in std_logic;
        Hit : out std_logic;
+       Miss : out std_logic;
        Data_Out: out std_logic_vector ( 31 downto 0)
        );
 end L1;
@@ -35,7 +36,7 @@ end component;
     signal index_L1: std_logic_vector ( 3 downto 0);
     signal offset_L1, offset_inv: std_logic_vector ( 5 downto 0);
     
-    signal WrEn_L1, WrEn_L1_pc, tag_match, h0, h1, miss, current_dirty_status: std_logic;
+    signal WrEn_L1, WrEn_L1_pc, tag_match, h0, h1, current_dirty_status: std_logic;
     signal L1_Block_Out, L1_Block_In, L1_hit_block_In  : std_logic_vector ( 534 downto 0);
     signal m0, m1, m2, m3, s1, s0, L1_hit_block_In_wdt, L1_Block_In_wdt, L1_Block_shifted : std_logic_vector ( 511 downto 0);
     
@@ -56,15 +57,17 @@ Comparator_L1: cmp_n generic map ( n => 22 )
 --output
 hit <= tag_match;
 
-miss_sig_map: not_gate port map (tag_match, miss);
+miss_sig_map: not_gate port map (tag_match, Miss);
 
 --When to write
 hitmap0: and_gate port map ( miss, Data_Valid_L2, h0);
 hitmap1: and_gate port map ( tag_match, Write_Enable, h1);
 hitmap2: or_gate port map ( h0, h1, WrEn_L1_pc);
+--clocking write
 clockingL1_write: dffr_a port map (clk, Enable, '0', '0', WrEn_L1_pc, '1', WrEn_L1);
 --WrEn_L1 means we have to write to L1
 
+--Write Hit
 --Get Data_In in right offset position for data write
 
 s0 <= "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000" & Data_In;
