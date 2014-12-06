@@ -5,6 +5,7 @@ use work.eecs361_gates.all;
 use work.eecs361.all;
 
 entity main_memory is
+	generic ( memfile_s: string);
 	port (
 		rst	in std_logic; 
 		addr	in std_logic_vector(31 downto 0); 
@@ -77,7 +78,7 @@ begin
   
   
    --main memory 
-   syncram_map:	syncram (mem_file => "LOLOLOLOLOLOLOLOLOLOLOLOTTTTTTAAAAXXXXXXXXXX.dat")
+   syncram_map:	syncram (mem_file => memfile_s)
    		port map (clk=>, cs=>'1', oe=>'1', we=>'0', 
    			  addr(31 downto 10)=>addr(31 downto 10), addr(9 downto 0)=>B"0000000000", 
    			  din=>B"00000000000000000000000000000000", dout=>syncram0);
@@ -96,7 +97,10 @@ begin
    --32-bit
    mux5_map:	mux_n generic map (n=>2048)	 port map (sel=>counter(0), src0=>mux4, src1(2047 downto 32)=>mux4(2015 downto 0),src1(31 downto 0)=>B"00000000000000000000000000000000", z=>mux5);
    
-   
+   --sid
+   generate_memory: for i in 0 to 31 generate
+		map_memory_reg: dffr_a port map (clk=>not_clk, arst=>'0',aload=>rst, adata=>'0', d=>input(i), enable=>'1',q=>out(i));
+end generate map_memory_reg;
    
    	
    mux3_map:	mux_n generic map (n=>512)	 port map (sel=>y(2), src0=>mux2, src1=>, z=>);
