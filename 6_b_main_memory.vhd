@@ -20,16 +20,8 @@ end main_memory;
 
 architecture structural of main_memory is
 
-signal mux0: std_logic_vector(2047 downto 0);
-signal mux1: std_logic_vector(2047 downto 0);
-signal mux2: std_logic_vector(2047 downto 0);
-signal mux3: std_logic_vector(2047 downto 0);
-signal mux4: std_logic_vector(2047 downto 0);
-signal mux5: std_logic_vector(2047 downto 0);
-signal syncram0: std_logic_vector(31 downto 0);
-signal fulladder0: std_logic_vector(31 downto 0);
-signal fulladder1: std_logic_vector(2047 downto 0);
-signal pc0: std_logic_vector(31 downto 0);
+signal mux0,mux1,mux2,mux3,mux4,mux5,fulladder1: std_logic_vector(2047 downto 0);
+signal syncram0,fulladder0,pc0: std_logic_vector(31 downto 0);
 signal not0: std_logic;
 
 
