@@ -63,7 +63,7 @@ begin
    map_memory_reg1: dffr_a port map (clk=>not_clk, arst=>rst,aload=>'0', adata=>'0', d=>fulladder1(i), enable=>'1',q=>data_out(i));
    end generate_memory1;
    
-   --Valid 
+   --valid 
    and0_map: and_gate port map (x=>counter(0), y=>counter(1), z=>and0);
    and1_map: and_gate port map (x=>and0, y=>counter(2), z=>and1);
    and2_map: and_gate port map (x=>and1, y=>counter(3), z=>and2);
