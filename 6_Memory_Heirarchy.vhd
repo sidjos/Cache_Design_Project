@@ -86,6 +86,15 @@ component main_memory is
 	);
 end component;
 
+component Counter_s is
+  port (
+    FA_1or0   : in std_logic;
+    Clk_ip    : in std_logic;
+    Reset     : in std_logic;
+    FA_ip_op   : out std_logic_vector(31 downto 0)
+    );
+end component;
+
 component syncboss is 
 port(
     clk: in std_logic;
@@ -108,7 +117,8 @@ L1_Miss_Count_s: syncboss port map (clk, L1_Miss, L1_Miss_sync);
 L2_Hit_Count_s: syncboss port map (clk, L2_Hit, L2_Hit_sync);
 L2_Miss_Count_s: syncboss port map (clk, L2_Miss, L2_Miss_sync);
 
-
+L1_Hit_Counter: Counter_S port map ('1', L1_Hit_sync, '0', l1_hit_cnt);
+L1_Miss_Counter: Counter_S port map ('1', L1_Miss_sync, '0', l1_miss_cnt);
 
 L1_map: L1 port map
        (
