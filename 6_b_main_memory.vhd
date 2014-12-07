@@ -23,7 +23,7 @@ architecture structural of main_memory is
 signal mux0,mux1,mux2,mux3,mux4,shifter,fulladder1, data_out_sig: std_logic_vector(2047 downto 0);
 signal mux6: std_logic_vector(9 downto 0);
 signal syncram0,counter,pc0: std_logic_vector(31 downto 0);
-signal not0,clk_new1,clk_new2,not_clk_new2,not_L2_Miss: std_logic;
+signal not0,and0,clk_new1,clk_new2,not_clk_new2,not_L2_Miss: std_logic;
 
 
 begin
@@ -36,8 +36,8 @@ begin
    --main memory 
    mux6_map: 	mux_n generic map (n=>10) port map (sel=>write, src0=>B"0000000000", src1=>address(9 downto 0), z=>mux6);
 
-   syncram_map:	syncram generic map (mem_file => mem_file_s);
-				port map (clk=>clk_new2, cs=>'1', oe=>'1', we=>write, addr(31 downto 10)=>addr(31 downto 10), addr(9 downto 0)=>mux6, din=>data_in, dout=>syncram0);
+   syncram_map:	syncram generic map (mem_file => "sort_correct")
+				port map (clk=>clk_new2, cs=>'1', oe=>'1', we=>write, addr(31 downto 10)=>address(31 downto 10), addr(9 downto 0)=>mux6, din=>data_in, dout=>syncram0);
   
    --32 bits counter (positive edge)
    fulladder0_map:  fulladder_32 port map (cin=>'0', x=>pc0, y=>B"00000000000000000000000000000001", z=>counter);
@@ -66,12 +66,14 @@ begin
    fulladder1_map:  fulladder_n generic map (n=>2048) port map (cin=>'0', x=>data_out_sig, y=>shifter, z=>fulladder1);
    not0_map:	not_gate port map (x=>clk_new2,z=>not_clk_new2);
    generate_memory1: for i in 0 to 2047 generate
-   map_memory_reg1: dffr_a port map (clk=>not_clk, arst=>rst,aload=>'0', adata=>'0', d=>fulladder1(i), enable=>'1',q=>data_out_sig(i));
+   map_memory_reg1: dffr_a port map (clk=>not_clk_new2, arst=>reset,aload=>'0', adata=>'0', d=>fulladder1(i), enable=>'1',q=>data_out_sig(i));
    end generate generate_memory1;
    
    --valid 
-   and0_map: and_gate port map (x=>counter(6), y=>counter(0), z=>data_valid);
-   or0_map:  or_gate port map (x=>clk, y=>data_valid, z=>clk_new1);
+   
+   data_valid <= and0;
+   and0_map: and_gate port map (x=>counter(6), y=>counter(0), z=>and0);
+   or0_map:  or_gate port map (x=>clk, y=>and0, z=>clk_new1);
    and1_map:  or_gate port map (x=>clk_new1, y=>L2_Miss, z=>clk_new2);
    
   
