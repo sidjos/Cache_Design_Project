@@ -20,9 +20,9 @@ end main_memory;
 
 architecture structural of main_memory is
 
-signal mux0,mux1,mux2,mux3,mux4,shifter,fulladder1, data_out_sig: std_logic_vector(2047 downto 0);
+signal mux0,mux1,mux2,mux3,mux4,shifter,before_reg_out, data_out_sig: std_logic_vector(2047 downto 0);
 signal mux6: std_logic_vector(9 downto 0);
-signal mux00,mux11,mux22,mux33,syncram0,counter,pc0,counter_minus_one: std_logic_vector(31 downto 0);
+signal syncram0,counter,counter_reg,counter_minus_one: std_logic_vector(31 downto 0);
 signal not1,and0,counter_minus_one_to_be_64,clk_with_stop,clk_with_stop_and_trigger,not_clk_with_stop_and_trigger: std_logic;
 
 
@@ -41,24 +41,19 @@ begin
 
 
    --main memory 
-   mux6_map: 	mux_n generic map (n=>10) port map (sel=>main_write, src0(9 downto 2)=>pc0(7 downto 0), src0(1 downto 0)=>B"00", src1=>address(9 downto 0), z=>mux6);
+   mux6_map: 	mux_n generic map (n=>10) port map (sel=>main_write, src0(9 downto 2)=>counter_reg(7 downto 0), src0(1 downto 0)=>B"00", src1=>address(9 downto 0), z=>mux6);
 
    syncram_map:	syncram generic map (mem_file => mem_file)
 				port map (clk=>clk_with_stop_and_trigger, cs=>'1', oe=>'1', we=>main_write, addr(31 downto 10)=>address(31 downto 10), addr(9 downto 0)=>mux6, din=>data_in, dout=>syncram0);
   
    --32 bits counter (positive edge)
-   fulladder0_map:  fulladder_32 port map (cin=>'0', x=>pc0, y=>B"00000000000000000000000000000001", z=>counter);
+   fulladder0_map:  fulladder_32 port map (cin=>'0', x=>counter_reg, y=>B"00000000000000000000000000000001", z=>counter);
    generate_memory0: for i in 0 to 31 generate
-   map_memory_reg0: dffr_a port map (clk=>clk_with_stop_and_trigger, arst=>reset, aload=>'0', adata=>'0', d=>counter(i), enable=>'1',q=>pc0(i));
+   map_memory_reg0: dffr_a port map (clk=>clk_with_stop_and_trigger, arst=>reset, aload=>'0', adata=>'0', d=>counter(i), enable=>'1',q=>counter_reg(i));
    end generate generate_memory0;
 	
-  
+    fulladder2_map:  fulladder_32 port map (cin=>'0', x=>counter_reg, y=>B"11111111111111111111111111111111", z=>counter_minus_one);
 
-
-
-   
-   
-    fulladder2_map:  fulladder_32 port map (cin=>'0', x=>pc0, y=>B"11111111111111111111111111111111", z=>counter_minus_one);
    --temporary 256 bytes Registers (negative edge)
    --1024-bit
    mux0_map:	mux_n generic map (n=>2048)	 port map (sel=>counter_minus_one(5), 
@@ -82,10 +77,10 @@ begin
    
    data_out_with_tag <= address(31 downto 10) & data_out_sig;
    
-   fulladder1_map:  fulladder_n generic map (n=>2048) port map (cin=>'0', x=>data_out_sig, y=>shifter, z=>fulladder1);
+   fulladder1_map:  fulladder_n generic map (n=>2048) port map (cin=>'0', x=>data_out_sig, y=>shifter, z=>before_reg_out);
 
    generate_memory1: for i in 0 to 2047 generate
-   map_memory_reg1: dffr_a port map (clk=>not_clk_with_stop_and_trigger, arst=>reset,aload=>'0', adata=>'0', d=>fulladder1(i), enable=>'1',q=>data_out_sig(i));
+   map_memory_reg1: dffr_a port map (clk=>not_clk_with_stop_and_trigger, arst=>reset,aload=>'0', adata=>'0', d=>before_reg_out(i), enable=>'1',q=>data_out_sig(i));
    end generate generate_memory1;
    
 end architecture structural;
