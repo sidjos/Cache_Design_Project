@@ -33,6 +33,15 @@ component shifter_512 is
 	);
 end component;
 
+component syncboss is 
+port(
+    clk     : in std_logic;
+    b: in std_logic;
+    Enable: in std_logic;
+    sync: out std_logic
+    );
+end component;
+
     signal tag_L1, current_data_tag_mem: std_logic_vector (21 downto 0);
     signal index_L1: std_logic_vector ( 3 downto 0);
     signal offset_L1, offset_inv: std_logic_vector ( 5 downto 0);
@@ -70,7 +79,7 @@ hitmap2: or_gate port map ( h0, h1, WrEn_L1_pc);
 
 --clocking write as well as making sure dirty bit is cleared first.
 --clockingL1_write: dffr_a port map (clk, Enable, current_dirty_status, '0', WrEn_L1_pc, '1', WrEn_L1);
-clockingL1_write: dffr_a port map (clk, Enable, '0', '0', WrEn_L1_pc, '1', WrEn_L1);
+clockingL1_write: syncboss port map (clk, Enable, WrEn_L1_pc, WrEn_L1);
 
 --WrEn_L1 means we have to write to L1
 

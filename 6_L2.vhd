@@ -45,6 +45,15 @@ component tag_L2_compare is
 	);
 end component;
 
+component syncboss is 
+port(
+    clk     : in std_logic;
+    b: in std_logic;
+    Enable: in std_logic;
+    sync: out std_logic
+    );
+end component;
+
     signal tag_L2 : std_logic_vector (21 downto 0);
     signal index_L2: std_logic_vector ( 1 downto 0);
     signal offset_L2, offset_inv: std_logic_vector ( 7 downto 0);
@@ -107,10 +116,10 @@ WrEn_L2_s0_pc <= WrEn_L2;
 
 
 --Clocking Write
-clockingL2_write0: dffr_a port map (clk, Enable, '0', '0', WrEn_L2_s0_pc, '1', WrEn_L2_s0);
-clockingL2_write1: dffr_a port map (clk, Enable, '0', '0', WrEn_L2_s1_pc, '1', WrEn_L2_s1);
-clockingL2_write2: dffr_a port map (clk, Enable, '0', '0', WrEn_L2_s2_pc, '1', WrEn_L2_s2);
-clockingL2_write3: dffr_a port map (clk, Enable, '0', '0', WrEn_L2_s3_pc, '1', WrEn_L2_s3);
+clockingL2_write0: syncboss port map (clk, WrEn_L2_s0_pc, WrEn_L2_s0);
+clockingL2_write1: syncboss port map (clk, WrEn_L2_s1_pc, WrEn_L2_s1);
+clockingL2_write2: syncboss port map (clk, Enable, WrEn_L2_s2_pc, WrEn_L2_s2);
+clockingL2_write3: syncboss port map (clk, Enable, WrEn_L2_s3_pc, WrEn_L2_s3);
 
 --What to write
 L2_Block_In <= Memory_Block_In;

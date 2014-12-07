@@ -90,19 +90,19 @@ component syncboss is
 port(
     clk: in std_logic;
     b: in std_logic;
+    Enable: in std_logic;
     sync: out std_logic
     );
 end component;
 
 signal L2_Block_Out: std_logic_vector ( 511 downto 0);
-signal Dirty_Bit_Evict, L2_Data_Valid, memory_data_valid, L2_Hit, L1_Hit, L1_Miss, L2_Miss, L1_Hit_sync, L1_Miss_sync, L2_Miss_sync, L2_Hit_sync: std_logic; 
+signal Dirty_Bit_Evict,EN_C, L2_Data_Valid, memory_data_valid, L2_Hit, L1_Hit, L1_Miss, L2_Miss, L1_Hit_sync, L1_Miss_sync, L2_Miss_sync, L2_Hit_sync: std_logic; 
 signal Memory_Block_In: std_logic_vector (2069 downto 0);
 
 
 begin
 
-
-ready_signal_map: syncboss port map (clk, L1_Hit, Ready);
+ready_signal_map: syncboss port map (clk, EN_C, L1_Hit, Ready);
 L1_Hit_Count_s: syncboss port map (clk, L1_Hit, L1_Hit_sync);
 L1_Miss_Count_s: syncboss port map (clk, L1_Miss, L1_Miss_sync);
 L2_Hit_Count_s: syncboss port map (clk, L2_Hit, L2_Hit_sync);
@@ -112,6 +112,8 @@ L1_Hit_Counter: Counter_S port map ('1', L1_Hit_sync, '0', l1_hit_cnt);
 L1_Miss_Counter: Counter_S port map ('1', L1_Miss_sync, '0', l1_miss_cnt);
 L1_Evict_Counter: Counter_S port map ('1', Dirty_Bit_Evict, '0', l1_evict_cnt);
 
+enable_comp: not_gate port map (EN, EN_C);
+
 L1_map: L1 port map
        (
        Data_In=>DataIn,
@@ -119,7 +121,7 @@ L1_map: L1 port map
        Address=>Addr,
        Write_Enable=>WR,
        Data_Valid_L2=>L2_Data_Valid,
-       Enable=>EN,
+       Enable=>EN_C,
        clk =>clk,
        L1_Hit=>L1_Hit,
        L1_Miss=> L1_Miss,
@@ -134,7 +136,7 @@ L2_map: L2 port map(
        Write_Enable=> WR,
        Memory_Block_Data_Valid=>memory_data_valid,
        Data_Valid_L2=>L2_Data_Valid,
-       Enable=>EN,
+       Enable=>EN_C,
        clk =>clk,
        L2_Hit=>L2_Hit,
        L2_Miss=>L2_Miss,
@@ -144,7 +146,7 @@ L2_map: L2 port map(
 mainMemoryMap: main_memory generic map ( mem_file => mem_file )
 	port map (
 		clk=>    clk,
-		reset =>		EN,
+		reset =>		EN_C,
 		address =>	Addr, 
 		L2_Miss=>	L2_miss,
 		main_write=>		WR,
