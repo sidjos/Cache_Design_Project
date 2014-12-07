@@ -35,7 +35,6 @@ begin
   
    --32 bits counter (positive edge)
    fulladder0_map:  fulladder_32 port map (cin=>'0', x=>pc0, y=>B"00000000000000000000000000000001", z=>counter);
-
    generate_memory0: for i in 0 to 31 generate
    map_memory_reg0: dffr_a port map (clk=>clk, arst=>reset, aload=>'0', adata=>'0', d=>fulladder0(i), enable=>'1',q=>pc0(i));
    end generate_memory0;
@@ -58,7 +57,6 @@ begin
    
    fulladder1_map:  fulladder_n generic map (n=>2048) port map (cin=>'0', x=>data_out, y=>shifter, z=>fulladder1);
    not0_map:	not_gate port map (x=>clk,z=>not_clk);
-   
    generate_memory1: for i in 0 to 2047 generate
    map_memory_reg1: dffr_a port map (clk=>not_clk, arst=>rst,aload=>'0', adata=>'0', d=>fulladder1(i), enable=>'1',q=>data_out(i));
    end generate_memory1;
