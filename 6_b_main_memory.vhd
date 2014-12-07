@@ -28,18 +28,17 @@ signal not0: std_logic;
 
 begin
     
+  --main memory 
+   mux6_map: 	mux_n generic map (n=>10) port map (sel=>write, src0=>B"0000000000", src1=>addr(9 downto 0), z=>mux6);
+   syncram_map:	syncram (mem_file => memfile_s)
+   		port map (clk=>, cs=>'1', oe=>'1', we=>write, addr(31 downto 10)=>addr(31 downto 10), addr(9 downto 0)=>mux6, din=>data_in, dout=>syncram0);
+  
    --32 bits counter (positive edge)
    fulladder0_map:  fulladder_32 port map (cin=>'0', x=>pc0, y=>B"00000000000000000000000000000001", z=>counter);
 
    generate_memory0: for i in 0 to 31 generate
    map_memory_reg0: dffr_a port map (clk=>clk, arst=>reset, aload=>'0', adata=>'0', d=>fulladder0(i), enable=>'1',q=>pc0(i));
    end generate_memory0;
-   
-   	
-   --main memory 
-   mux6_map: 	mux_n generic map (n=>10) port map (sel=>write, src0=>B"0000000000", src1=>addr(9 downto 0), z=>mux6);
-   syncram_map:	syncram (mem_file => memfile_s)
-   		port map (clk=>, cs=>'1', oe=>'1', we=>write, addr(31 downto 10)=>addr(31 downto 10), addr(9 downto 0)=>mux6, din=>data_in, dout=>syncram0);
    
    --shifter
    --1024-bit
