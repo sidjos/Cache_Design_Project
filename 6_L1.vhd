@@ -84,7 +84,7 @@ s1 <= "0000000000000000000000000000000000000000000000000000000000000000000000000
 L1_shift_535_map0: shifter_512 port map ( s0, offset_L1, m0);
 L1_shift_535_map1: shifter_512 port map ( s1, offset_L1, m1);
 not_mask_map: not_gate_n generic map (n=>512) port map ( m1, m2 );
-and_map_L1: and_gate_n generic map (n=>512) port map (m2, L1_Block_Out, m3);
+and_map_L1: and_gate_n generic map (n=>512) port map (m2, L1_Block_Out (511 downto 0), m3);
 or_map_L1: or_gate_n generic map (n=>512) port map (m3, m0, L1_hit_block_In_wdt);
 
 

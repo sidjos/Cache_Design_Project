@@ -63,8 +63,8 @@ begin
 
   tester_map : cache_test
     generic map (
-      data_trace_file => "data/random_data_trace",
-      addr_trace_file => "data/random_addr_trace"
+      data_trace_file => "data/readonly_data_trace",
+      addr_trace_file => "data/readonly_addr_trace"
     )
     port map (
       DataIn => dataout,
