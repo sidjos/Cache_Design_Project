@@ -109,6 +109,7 @@ L2_Hit_Count_s: syncboss port map (clk, L2_Hit, L2_Hit_sync);
 L2_Miss_Count_s: syncboss port map (clk, L2_Miss, L2_Miss_sync);
 
 
+
 L1_map: L1 port map
        (
        Data_In=>DataIn,
@@ -142,7 +143,7 @@ mainMemoryMap: main_memory generic map ( memfile_s => mem_file );
 		clk=>    clk,
 		reset =>		EN,
 		address =>	Addr, 
-		L2_Miss=>	L2_miss_sig,
+		L2_Miss=>	L2_miss,
 		write=>		WR,
 		data_in=>	DataIn,
 		data_in_buffer=>data_in_write_buffer,

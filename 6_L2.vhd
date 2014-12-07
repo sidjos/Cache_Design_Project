@@ -83,7 +83,7 @@ miss_sig_map_L2: not_gate port map (L2_tag_match, L2_tag_miss);
 L2_hit <= L2_tag_match;
 L2_Miss <= L2_tag_miss;
 
---Need to split L2_Block_Out
+--Need to split L2_Block_Out to generate output for L1
 
 b0 <= L2_Block_Out( 511 downto 0);
 b1 <= L2_Block_Out( 1023 downto 512);
@@ -99,14 +99,19 @@ muxL2_2: mux_n generic map (n=>512) port map ( offset_L2(7), m0, m1, L2_Data_Out
 hitmap0: and_gate port map ( L2_tag_miss, Memory_Block_Data_Valid, h0);
 hitmap1: and_gate port map ( L2_tag_match, Write_Enable, h1);
 hitmap2: or_gate port map ( h0, h1, WrEn_L2);
---Clocking Write
-clockingL2_write: dffr_a port map (clk, Enable, '0', '0', WrEn_L2_s0_pc, '1', WrEn_L2_s0);
 --WrEn_L2 means we have to write L2 memory
 
---Where to write
-WrEn_L2_s0_pc <= WrEn_L2; -- have to implement LRU
+--Where to write/ LRU Implementation
+WrEn_L2_s0_pc <= WrEn_L2;
+
+
+--Clocking Write
+clockingL2_write0: dffr_a port map (clk, Enable, '0', '0', WrEn_L2_s0_pc, '1', WrEn_L2_s0);
+clockingL2_write1: dffr_a port map (clk, Enable, '0', '0', WrEn_L2_s1_pc, '1', WrEn_L2_s1);
+clockingL2_write2: dffr_a port map (clk, Enable, '0', '0', WrEn_L2_s2_pc, '1', WrEn_L2_s2);
+clockingL2_write3: dffr_a port map (clk, Enable, '0', '0', WrEn_L2_s3_pc, '1', WrEn_L2_s3);
 
 --What to write
-L2_Block_In <= Memory_Block_In; --implement mux
+L2_Block_In <= Memory_Block_In;
 
 end structural; 
