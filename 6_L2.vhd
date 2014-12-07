@@ -82,6 +82,7 @@ miss_sig_map_L2: not_gate port map (L2_tag_match, L2_tag_miss);
 --output
 L2_hit <= L2_tag_match;
 L2_Miss <= L2_tag_miss;
+Data_Valid_L2 <= L2_tag_match;
 
 --Need to split L2_Block_Out to generate output for L1
 

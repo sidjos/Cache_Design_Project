@@ -5,7 +5,7 @@ use work.eecs361_gates.all;
 use work.eecs361.all;
 
 entity main_memory is
-	--generic ( mem_file: string);
+	generic ( mem_file_s: string);
 	port (
 		clk:     		in std_logic; 
 		reset:		in std_logic; 
@@ -36,8 +36,8 @@ begin
    --main memory 
    mux6_map: 	mux_n generic map (n=>10) port map (sel=>write, src0=>B"0000000000", src1=>address(9 downto 0), z=>mux6);
 
- --  syncram_map:	generic map (mem_file => "sort_corrected_branch.dat");
-				--port map (clk=>clk_new2, cs=>'1', oe=>'1', we=>write, addr(31 downto 10)=>addr(31 downto 10), addr(9 downto 0)=>mux6, din=>data_in, dout=>syncram0);
+   syncram_map:	syncram generic map (mem_file => mem_file_s);
+				port map (clk=>clk_new2, cs=>'1', oe=>'1', we=>write, addr(31 downto 10)=>addr(31 downto 10), addr(9 downto 0)=>mux6, din=>data_in, dout=>syncram0);
   
    --32 bits counter (positive edge)
    fulladder0_map:  fulladder_32 port map (cin=>'0', x=>pc0, y=>B"00000000000000000000000000000001", z=>counter);
