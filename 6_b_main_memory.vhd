@@ -13,7 +13,6 @@ entity main_memory is
 		L2_Miss: 	in std_logic;
 		write: 		in std_logic;
 		data_in: 	in std_logic_vector (31 downto 0);
-		data_in_buffer: in std_logic_vector ( 63 downto 0);
 		data_valid: 	out std_logic;
 		data_out: 	out std_logic_vector(2047 downto 0)
 	);
