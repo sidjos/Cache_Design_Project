@@ -79,7 +79,8 @@ hitmap2: or_gate port map ( h0, h1, WrEn_L1_pc);
 
 --clocking write as well as making sure dirty bit is cleared first.
 --clockingL1_write: dffr_a port map (clk, Enable, current_dirty_status, '0', WrEn_L1_pc, '1', WrEn_L1);
-clockingL1_write: syncboss port map (clk, Enable, WrEn_L1_pc, WrEn_L1);
+clockingL1_write: syncboss port map (clk, WrEn_L1_pc, Enable, WrEn_L1);
+--WrEn_L1 <= WrEn_L1_pc;
 
 --WrEn_L1 means we have to write to L1
 

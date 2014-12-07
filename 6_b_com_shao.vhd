@@ -31,7 +31,7 @@ begin
     	--hit
     	or0_map:	or_gate 			 port map (x=>com0,y=>com1,z=>or0);
     	or1_map:	or_gate 			 port map (x=>com2,y=>com3,z=>or1);
-    	or2_map:	or_gate 			 port map (x=>com2,y=>com3,z=>hit);
+    	or2_map:	or_gate 			 port map (x=>or1,y=>or0,z=>hit);
     	
     	--output 
 	mux0_map:	mux_n generic map (n=>2070)	 port map (sel=>com1, src0=>input_0, src1=>input_1, z=>mux0);

@@ -113,13 +113,14 @@ hitmap2: or_gate port map ( h0, h1, WrEn_L2);
 
 --Where to write/ LRU Implementation
 WrEn_L2_s0_pc <= WrEn_L2;
-
+--WrEn_L2_s0 <= WrEn_L2;
 
 --Clocking Write
-clockingL2_write0: syncboss port map (clk, WrEn_L2_s0_pc, WrEn_L2_s0);
-clockingL2_write1: syncboss port map (clk, WrEn_L2_s1_pc, WrEn_L2_s1);
-clockingL2_write2: syncboss port map (clk, Enable, WrEn_L2_s2_pc, WrEn_L2_s2);
-clockingL2_write3: syncboss port map (clk, Enable, WrEn_L2_s3_pc, WrEn_L2_s3);
+
+clockingL2_write0: syncboss port map (clk, WrEn_L2_s0_pc, Enable, WrEn_L2_s0);
+clockingL2_write1: syncboss port map (clk, WrEn_L2_s1_pc, Enable, WrEn_L2_s1);
+clockingL2_write2: syncboss port map (clk, WrEn_L2_s2_pc, Enable, WrEn_L2_s2);
+clockingL2_write3: syncboss port map (clk, WrEn_L2_s3_pc, Enable, WrEn_L2_s3);
 
 --What to write
 L2_Block_In <= Memory_Block_In;

@@ -102,7 +102,7 @@ signal Memory_Block_In: std_logic_vector (2069 downto 0);
 
 begin
 
-ready_signal_map: syncboss port map (clk, EN_C, L1_Hit, Ready);
+ready_signal_map: syncboss port map (clk, L1_Hit, EN_C, Ready);
 L1_Hit_Count_s: syncboss port map (clk, L1_Hit, L1_Hit_sync);
 L1_Miss_Count_s: syncboss port map (clk, L1_Miss, L1_Miss_sync);
 L2_Hit_Count_s: syncboss port map (clk, L2_Hit, L2_Hit_sync);
