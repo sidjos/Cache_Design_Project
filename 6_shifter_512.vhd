@@ -14,7 +14,7 @@ entity shifter_512 is
 	);
 end shifter_512;
 
-architecture structural of shifter_535 is
+architecture structural of shifter_512 is
 
 signal mux0: std_logic_vector(511 downto 0);
 signal mux1: std_logic_vector(511 downto 0);
