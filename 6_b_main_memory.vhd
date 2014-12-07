@@ -5,7 +5,7 @@ use work.eecs361_gates.all;
 use work.eecs361.all;
 
 entity main_memory is
-	generic ( mem_file_s: string);
+	generic ( mem_file: string);
 	port (
 		clk:     		in std_logic; 
 		reset:		in std_logic; 
@@ -14,7 +14,7 @@ entity main_memory is
 		main_write: 	in std_logic;
 		data_in: 	in std_logic_vector (31 downto 0);
 		data_valid: 	out std_logic;
-		data_out: 	out std_logic_vector(2047 downto 0)
+		data_out_with_tag: 	out std_logic_vector(2069 downto 0)
 	);
 end main_memory;
 
@@ -41,7 +41,7 @@ begin
    --main memory 
    mux6_map: 	mux_n generic map (n=>10) port map (sel=>main_write, src0=>B"0000000000", src1=>address(9 downto 0), z=>mux6);
 
-   syncram_map:	syncram generic map (mem_file => "sort_correct")
+   syncram_map:	syncram generic map (mem_file => mem_file)
 				port map (clk=>clk_with_stop_and_trigger, cs=>'1', oe=>'1', we=>main_write, addr(31 downto 10)=>address(31 downto 10), addr(9 downto 0)=>mux6, din=>data_in, dout=>syncram0);
   
    --32 bits counter (positive edge)
@@ -65,26 +65,13 @@ begin
    --32-bit
    mux5_map:	mux_n generic map (n=>2048)	 port map (sel=>counter_minus_one(0), src0=>mux4, src1(2047 downto 32)=>mux4(2015 downto 0),src1(31 downto 0)=>B"00000000000000000000000000000000", z=>shifter);
    
-   data_out <= data_out_sig;
+   data_out_with_tag <= address(31 downto 10) & data_out_sig;
    
    fulladder1_map:  fulladder_n generic map (n=>2048) port map (cin=>'0', x=>data_out_sig, y=>shifter, z=>fulladder1);
 
    generate_memory1: for i in 0 to 2047 generate
    map_memory_reg1: dffr_a port map (clk=>not_clk_with_stop_and_trigger, arst=>reset,aload=>'0', adata=>'0', d=>fulladder1(i), enable=>'1',q=>data_out_sig(i));
    end generate generate_memory1;
-   
-  
-  
-
-
-
-    
-
-
-
-
-   
-  
    
 end architecture structural;
 

@@ -19,7 +19,7 @@ entity L1 is
        L1_Hit : out std_logic;
        L1_Miss : out std_logic;
        Data_Out: out std_logic_vector ( 31 downto 0);
-       Dirty_Status: out std_logic
+       Dirty_Bit_Evict: out std_logic
        );
 end L1;
        
@@ -61,14 +61,17 @@ Comparator_L1: cmp_n generic map ( n => 22 )
 L1_Hit <= tag_match;
 L1_Miss <= tag_miss;
 miss_sig_map: not_gate port map (tag_match, tag_miss);
+evicting_dirty_bit_map: and_gate port map (current_dirty_status, WrEn_L1_pc, Dirty_Bit_Evict); 
 
 --When to write
 hitmap0: and_gate port map ( tag_miss, Data_Valid_L2, h0);
 hitmap1: and_gate port map ( tag_match, Write_Enable, h1);
 hitmap2: or_gate port map ( h0, h1, WrEn_L1_pc);
 
---clocking write
+--clocking write as well as making sure dirty bit is cleared first.
+--clockingL1_write: dffr_a port map (clk, Enable, current_dirty_status, '0', WrEn_L1_pc, '1', WrEn_L1);
 clockingL1_write: dffr_a port map (clk, Enable, '0', '0', WrEn_L1_pc, '1', WrEn_L1);
+
 --WrEn_L1 means we have to write to L1
 
 --Write Hit
