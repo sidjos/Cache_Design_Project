@@ -54,7 +54,7 @@ begin
    --32-bit
    mux5_map:	mux_n generic map (n=>2048)	 port map (sel=>counter(0), src0=>mux4, src1(2047 downto 32)=>mux4(2015 downto 0),src1(31 downto 0)=>B"00000000000000000000000000000000", z=>shifter);
    
-   --Temporary 256 bytes Registers (negative edge)
+   --temporary 256 bytes Registers (negative edge)
    
    fulladder1_map:  fulladder_n generic map (n=>2048) port map (cin=>'0', x=>data_out, y=>shifter, z=>fulladder1);
    not0_map:	not_gate port map (x=>clk,z=>not_clk);
