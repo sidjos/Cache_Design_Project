@@ -23,7 +23,7 @@ architecture structural of main_memory is
 signal mux0,mux1,mux2,mux3,mux4,shifter,fulladder1, data_out_sig: std_logic_vector(2047 downto 0);
 signal mux6: std_logic_vector(9 downto 0);
 signal syncram0,counter,pc0,counter_minus_one,fulladder2: std_logic_vector(31 downto 0);
-signal not0,and0,counter_minus_one_to_be_64,clk_with_stop,clk_with_stop_and_trigger,not_clk_with_stop_and_trigger: std_logic;
+signal not0,not1,and0,counter_minus_one_to_be_64,clk_with_stop,clk_with_stop_and_trigger,not_clk_with_stop_and_trigger: std_logic;
 
 
 begin
@@ -32,9 +32,11 @@ begin
 
    --valid 
    data_valid <= counter_minus_one_to_be_64;
-   and0_map: and_gate port map (x=>counter_minus_one(6), y=>counter_minus_one(0), z=>counter_minus_one_to_be_64);
+   and0_map: and_gate port map (x=>counter_minus_one(6), y=>counter_minus_one(0), z=>and0);
+   not1_map: not_gate port map (x=>counter_minus_one(1), z=>not1);
+   and2_map: and_gate port map (x=>and0, y=>not1, z=>counter_minus_one_to_be_64);
    or0_map:  or_gate port map (x=>clk, y=>counter_minus_one_to_be_64, z=>clk_with_stop);
-   and1_map:  or_gate port map (x=>clk_with_stop, y=>L2_Miss, z=>clk_with_stop_and_trigger);
+   and1_map:  and_gate port map (x=>clk_with_stop, y=>L2_Miss, z=>clk_with_stop_and_trigger);
    not0_map:	not_gate port map (x=>clk_with_stop_and_trigger,z=>not_clk_with_stop_and_trigger);
 
 
