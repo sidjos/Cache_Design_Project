@@ -22,8 +22,8 @@ architecture structural of main_memory is
 
 signal mux0,mux1,mux2,mux3,mux4,shifter,fulladder1, data_out_sig: std_logic_vector(2047 downto 0);
 signal mux6: std_logic_vector(9 downto 0);
-signal syncram0,counter,pc0,counter_minus_one,fulladder2: std_logic_vector(31 downto 0);
-signal not0,not1,and0,counter_minus_one_to_be_64,clk_with_stop,clk_with_stop_and_trigger,not_clk_with_stop_and_trigger: std_logic;
+signal syncram0,counter,pc0,counter_minus_one: std_logic_vector(31 downto 0);
+signal not1,and0,counter_minus_one_to_be_64,clk_with_stop,clk_with_stop_and_trigger,not_clk_with_stop_and_trigger: std_logic;
 
 
 begin
