@@ -23,7 +23,7 @@ architecture structural of main_memory is
 signal mux0,mux1,mux2,mux3,mux4,shifter,mux00,mux11,mux22,mux33,mux44,clean_32bit,before_reg_out, data_out_sig, not_clean_32bit, data_out_sig_clean: std_logic_vector(2047 downto 0);
 signal mux6: std_logic_vector(9 downto 0);
 signal syncram0,counter,counter_reg,counter_minus_one: std_logic_vector(31 downto 0);
-signal not1,and0,counter_minus_one_to_be_64,clk_with_stop,clk_with_stop_and_trigger,not_clk_with_stop_and_trigger: std_logic;
+signal not1,not11,and0,counter_minus_one_to_be_64,counter_reg_to_be_64,clk_with_stop,clk_with_stop_and_trigger,not_clk_with_stop_and_trigger: std_logic;
 
 
 begin
@@ -31,10 +31,12 @@ begin
    
 
    --valid 
-   data_valid <= counter_minus_one_to_be_64;
-   --and0_map: and_gate port map (x=>counter_reg(6), y=>counter_reg(0), z=>and0);
-   not1_map: not_gate port map (x=>counter_reg(1), z=>not1);
-   and2_map: and_gate port map (x=>counter_reg(6), y=>not1, z=>counter_minus_one_to_be_64);
+ --not11_map: not_gate port map (x=>counter_minus_one(1), z=>not11);
+ --and22_map: and_gate port map (x=>counter_minus_one(6), y=>not11, z=>counter_minus_one_to_be_64);
+ data_valid <= counter_minus_one_to_be_64;
+   
+   not1_map: not_gate port map (x=>counter_minus_one(1), z=>not1);
+   and2_map: and_gate port map (x=>counter_minus_one(6), y=>not1, z=>counter_minus_one_to_be_64);
    or0_map:  or_gate port map (x=>clk, y=>counter_minus_one_to_be_64, z=>clk_with_stop);
    and1_map:  and_gate port map (x=>clk_with_stop, y=>L2_Miss, z=>clk_with_stop_and_trigger);
    not0_map:	not_gate port map (x=>clk_with_stop_and_trigger,z=>not_clk_with_stop_and_trigger);
