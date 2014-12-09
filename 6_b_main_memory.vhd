@@ -82,7 +82,7 @@ begin
    --main memory 
   
    syncram_map:	syncram generic map (mem_file => mem_file)
-				port map (clk=>clk_with_stop_and_trigger, cs=>'1', oe=>'1', we=>main_write, addr(31 downto 8)=>address(31 downto 8), addr(7 downto 0)=>B"00000000", din=>data_in(511 downto 480), dout=>syncram0);
+				port map (clk=>clk_with_stop_and_trigger, cs=>'1', oe=>'1', we=>main_write, addr(31 downto 8)=>address(31 downto 8), addr(7 downto 2)=>counter_reg(5 downto 0), addr(1 downto 0)=>B"00", din=>data_in(511 downto 480), dout=>syncram0);
   
    --32 bits counter (positive edge)
    fulladder0_map:  fulladder_32 port map (cin=>'0', x=>counter_reg, y=>B"00000000000000000000000000000001", z=>counter);
