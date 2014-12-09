@@ -55,6 +55,16 @@ port(
     );
 end component;
 
+component lru_counter_to_offset_s is
+  port ( 
+    Update : in std_logic;
+    Rd     : in std_logic_vector(3 downto 0);
+    Wr     : in std_logic_vector(3 downto 0);
+    Reset  : in std_logic;
+    Wr_o   : out std_logic_vector(3 downto 0)
+    );
+  end component;
+
     signal tag_L2 : std_logic_vector (21 downto 0);
     signal index_L2: std_logic_vector ( 1 downto 0);
     signal offset_L2, offset_inv: std_logic_vector ( 7 downto 0);
@@ -110,11 +120,17 @@ muxL2_2: mux_n generic map (n=>512) port map ( offset_L2(7), m0, m1, L2_Data_Out
 hitmap0: and_gate port map ( L2_tag_miss, Memory_Block_Data_Valid, h0);
 hitmap1: and_gate port map ( L2_tag_match, Write_Enable, h1);
 hitmap2: or_gate port map ( h0, h1, WrEn_L2);
+--hitmap3: or_gate port map (WrEn_L2_pc, Main_Memory_Write_Valid, WrEn_L2);
 --WrEn_L2 means we have to write L2 memory
 
+
+--------------------------------
 --Where to write/ LRU Implementation
 WrEn_L2_s0_pc <= WrEn_L2;
---WrEn_L2_s0 <= WrEn_L2;
+--Initialize LRU here and comment the above line. Whatever output the LRU is giving, AND it with
+--WrEn_L2 and we will have the write signals for the four sets. 
+--------------------------------
+
 
 --Clocking Write
 
