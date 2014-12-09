@@ -13,13 +13,15 @@ entity L1 is
        L2_Block_In : in std_logic_vector (511 downto 0);
        Address: in std_logic_vector ( 31 downto 0);
        Write_Enable: in std_logic;
+       Memory_Block_Data_Valid : in std_logic;
        Data_Valid_L2: in std_logic;
        Enable: in std_logic;
        clk  : in std_logic;
        L1_Hit : out std_logic;
        L1_Miss : out std_logic;
        Data_Out: out std_logic_vector ( 31 downto 0);
-       Dirty_Bit_Evict: out std_logic
+       Dirty_Bit_Evict: out std_logic;
+       Data_Out_64: out std_logic_vector ( 511 downto 0)
        );
 end L1;
        

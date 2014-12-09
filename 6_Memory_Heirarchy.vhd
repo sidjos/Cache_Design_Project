@@ -36,13 +36,16 @@ component L1 is
        L2_Block_In: in std_logic_vector (511 downto 0);
        Address: in std_logic_vector ( 31 downto 0);
        Write_Enable: in std_logic;
+       Memory_Block_Data_Valid : in std_logic;
        Data_Valid_L2: in std_logic;
        Enable: in std_logic;
        clk: in std_logic;
        L1_Hit: out std_logic;
        L1_Miss: out std_logic;
        Dirty_Bit_Evict: out std_logic;
-       Data_Out: out std_logic_vector ( 31 downto 0)
+       Data_Out: out std_logic_vector ( 31 downto 0);
+       Data_Out_64: out std_logic_vector ( 511 downto 0);
+       Write_Main_Memory: out std_logic
        );
 end component;
 
@@ -63,16 +66,18 @@ component L2 is
        );
 end component;
 
+	
 component main_memory is
 	generic ( mem_file: string);
 	port (
-		clk:     		in std_logic; 
+		clk:     	in std_logic; 
 		reset:		in std_logic; 
-		address:		in std_logic_vector(31 downto 0); 
-		L2_Miss: 	in std_logic;
-		main_write: 	in std_logic;
-		data_in: 	in std_logic_vector (31 downto 0);
-		data_valid: 	out std_logic;
+		address:	in std_logic_vector(31 downto 0); 
+		L2_Miss: 	in std_logic; --reading
+		main_write: 	in std_logic; --writing
+		data_in: 	in std_logic_vector (511 downto 0);
+		data_valid_read: 	out std_logic;
+		data_valid_write: 	out std_logic;
 		data_out_with_tag: 	out std_logic_vector(2069 downto 0)
 	);
 end component;
@@ -95,8 +100,8 @@ port(
     );
 end component;
 
-signal L2_Block_Out: std_logic_vector ( 511 downto 0);
-signal Dirty_Bit_Evict,EN_C, Reset_for_Main_Memory, Ready_Sig, L2_Data_Valid, memory_data_valid, L2_Hit, L1_Hit, L1_Miss, L2_Miss, L1_Hit_sync, L1_Miss_sync, L2_Miss_sync, L2_Hit_sync: std_logic; 
+signal L2_Block_Out, Data_L1: std_logic_vector ( 511 downto 0);
+signal Write_Main_Memory, Memory_Write_Complete, Dirty_Bit_Evict,EN_C, Reset_for_Main_Memory, Ready_Sig, L2_Data_Valid, memory_data_valid, L2_Hit, L1_Hit, L1_Miss, L2_Miss, L1_Hit_sync, L1_Miss_sync, L2_Miss_sync, L2_Hit_sync: std_logic; 
 signal Memory_Block_In: std_logic_vector (2069 downto 0);
 
 
@@ -124,17 +129,20 @@ L1_map: L1 port map
        L2_Block_In=>L2_Block_Out,
        Address=>Addr,
        Write_Enable=>WR,
+       Memory_valid_write=> memory_write_complete,
        Data_Valid_L2=>L2_Data_Valid,
        Enable=>EN_C,
        clk =>clk,
        L1_Hit=>L1_Hit,
        L1_Miss=> L1_Miss,
        Dirty_Bit_Evict => Dirty_Bit_Evict,
-       Data_Out=>DataOut
+       Data_Out=>DataOut,
+       Data_Out_64 => Data_L1,
+       Write_Main_Memory => Write_Main_Memory
        );
 
 L2_map: L2 port map(
-       Data_In => DataIn,
+       Data_In => Data_L1,
        Memory_Block_In=>Memory_Block_In ,
        Address=>Addr,
        Write_Enable=> WR,
@@ -153,10 +161,12 @@ mainMemoryMap: main_memory generic map ( mem_file => mem_file )
 		reset =>		Reset_for_Main_Memory,
 		address =>	Addr, 
 		L2_Miss=>	L2_miss,
-		main_write=>		WR,
-		data_in=>	DataIn,
-		data_valid=>	memory_data_valid,
+		main_write=> Write_Main_Memory,
+		data_in=>	Data_L1,
+		data_valid_read=>	memory_data_valid,
+		data_valid_write=> memory_write_complete,
 		data_out_with_tag=>	Memory_Block_In
 	);
+
 
 end structural;
