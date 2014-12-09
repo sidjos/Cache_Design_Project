@@ -91,12 +91,11 @@ hitmap3: and_gate port map (WrEn_L1_pc_d, dirty_bit_comp, WrEn_L1_pc);
 --clocking write as well as making sure dirty bit is cleared first.
 clockingL1_write: syncboss port map (clk, WrEn_L1_pc, Enable, WrEn_L1);
 
---When to write for write miss
 
+--Write Miss/ signals for main memory
+Data_Out_64 <= L1_Block_Out;
+write_miss_mem_write_sig_map: and_gate port map (Write_Enable, current_dirty_status, Write_Main_Memory);
 
-
-
---Write Hit
 
 --Get Data_In in right offset position for data write
 
