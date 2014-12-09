@@ -86,7 +86,7 @@ hitmap0: and_gate port map ( tag_miss, Data_Valid_L2, h0); -- read miss, write m
 hitmap1: and_gate port map ( tag_match, Write_Enable, h1); -- write hit
 hitmap2: or_gate port map ( h0, h1, WrEn_L1_pc_d);
 hitmap3: not_gate port map(current_dirty_status, dirty_bit_comp);
-hitmap3: and_gate port map (WrEn_L1_pc_d, dirty_bit_comp, WrEn_L1_pc);
+hitmap4: and_gate port map (WrEn_L1_pc_d, dirty_bit_comp, WrEn_L1_pc);
 
 --clocking write as well as making sure dirty bit is cleared first.
 clockingL1_write: syncboss port map (clk, WrEn_L1_pc, Enable, WrEn_L1);
