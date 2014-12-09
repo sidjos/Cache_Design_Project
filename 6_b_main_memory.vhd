@@ -25,7 +25,10 @@ signal mux0,mux1,mux2,mux3,mux4,shifter,mux00,mux11,mux22,mux33,mux44,clean_32bi
 signal mux0_wr,mux1_wr,mux2_wr,mux3_wr,mux4_wr,shifter_wr,not0_wr: std_logic_vector(511 downto 0);
 signal mux6: std_logic_vector(7 downto 0);
 signal syncram0,counter,counter_reg,counter_minus_one: std_logic_vector(31 downto 0);
-signal not1,not11,and0,counter_minus_one_to_be_64,counter_reg_to_be_64,clk_with_stop_write,clk_with_stop_and_trigger_write,not_clk_with_stop_and_trigger_write,clk_with_stop_read,clk_with_stop_and_trigger_read,not_clk_with_stop_and_trigger_read,counter_to_be_all_zero,and0_wr,and1_wr,and2_wr: std_logic;
+signal not1,not11,and0,counter_minus_one_to_be_64, counter_reg_to_be_64, clk_with_stop_write,clk_with_stop_and_trigger_write,
+not_clk_with_stop_and_trigger_write,clk_with_stop_read,clk_with_stop_and_trigger_read,
+not_clk_with_stop_and_trigger_read,counter_to_be_all_zero,and0_wr,and1_wr,and2_wr,
+clk_with_stop_and_trigger, not_clk_with_stop_and_trigger: std_logic;
 
 
 begin
@@ -47,18 +50,18 @@ begin
  
    
    
-   and0_wr_map: and_gate port map (x=>not0_wr(0),y=>not0_wr(1),z=>and0_wr);
-   and1_wr_map: and_gate port map (x=>sel=>not0_wr(2),y=>sel=>not0_wr(3),z=>and1_wr);
-   and2_wr_map: and_gate port map (x=>and0_wr,y=>and1_wr,z=>and2_wr);
-   and3_wr_map: and_gate port map (x=>and2_wr,y=>not0_wr(4),z=>counter_to_be_all_zero);
+   and0_wr_map: 	and_gate port map (x=>not0_wr(0),y=>not0_wr(1),z=>and0_wr);
+   and1_wr_map: 		and_gate port map (x=>not0_wr(2),y=>not0_wr(3),z=>and1_wr);
+   and2_wr_map:		 and_gate port map (x=>and0_wr,y=>and1_wr,z=>and2_wr);
+   and3_wr_map: 	and_gate port map (x=>and2_wr,y=>not0_wr(4),z=>counter_to_be_all_zero);
    data_valid_write <= counter_to_be_all_zero;
    
-   or00_map:  or_gate port map (x=>clk, y=>counter_to_be_all_zero, z=>clk_with_stop_wrtie);
-   and11_map:  and_gate port map (x=>clk_with_stop_write, y=>main_write, z=>clk_with_stop_and_trigger_write);
-   not00_map:	not_gate port map (x=>clk_with_stop_and_trigger_write,z=>not_clk_with_stop_and_trigger_write);
+   or00_map:  		or_gate port map (x=>clk, y=>counter_to_be_all_zero, z=>clk_with_stop_write);
+   and11_map:  		and_gate port map (x=>clk_with_stop_write, y=>main_write, z=>clk_with_stop_and_trigger_write);
+   not00_map:		not_gate port map (x=>clk_with_stop_and_trigger_write,z=>not_clk_with_stop_and_trigger_write);
    
-   mux_clk_map: mux_n generic map (n=>1) port map (sel=>main_write, src0=>clk_with_stop_and_trigger_read, src1=>clk_with_stop_and_trigger_write, z=>clk_with_stop_and_trigger);
-   mux_not_clk_map: mux_n generic map (n=>1) port map (sel=>main_write, src0=>not_clk_with_stop_and_trigger_read, src1=>not_clk_with_stop_and_trigger_write, z=>not_clk_with_stop_and_trigger);
+   mux_clk_map: mux port map (sel=>main_write, src0=>clk_with_stop_and_trigger_read, src1=>clk_with_stop_and_trigger_write, z=>clk_with_stop_and_trigger);
+   mux_not_clk_map: mux port map (sel=>main_write, src0=>not_clk_with_stop_and_trigger_read, src1=>not_clk_with_stop_and_trigger_write, z=>not_clk_with_stop_and_trigger);
  
  
  
@@ -74,9 +77,9 @@ begin
    
    not1_map: not_gate port map (x=>counter_minus_one(1), z=>not1);
    and2_map: and_gate port map (x=>counter_minus_one(6), y=>not1, z=>counter_minus_one_to_be_64);
-   or0_map:  or_gate port map (x=>clk, y=>counter_minus_one_to_be_64, z=>clk_with_stop);
-   and1_map:  and_gate port map (x=>clk_with_stop, y=>L2_Miss, z=>clk_with_stop_and_trigger);
-   not0_map:	not_gate port map (x=>clk_with_stop_and_trigger,z=>not_clk_with_stop_and_trigger);
+   or0_map:  or_gate port map (x=>clk, y=>counter_minus_one_to_be_64, z=>clk_with_stop_read);
+   and1_map:  and_gate port map (x=>clk_with_stop_read, y=>L2_Miss, z=>clk_with_stop_and_trigger_read);
+   not0_map:	not_gate port map (x=>clk_with_stop_and_trigger_read,z=>not_clk_with_stop_and_trigger_read);
 
 
    --main memory 
