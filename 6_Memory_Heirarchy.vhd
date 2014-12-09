@@ -36,6 +36,7 @@ component L1 is
        L2_Block_In: in std_logic_vector (511 downto 0);
        Address: in std_logic_vector ( 31 downto 0);
        Write_Enable: in std_logic;
+       Memory_Valid_Write: in std_logic;
        Memory_Block_Data_Valid : in std_logic;
        Data_Valid_L2: in std_logic;
        Enable: in std_logic;
@@ -130,6 +131,7 @@ L1_map: L1 port map
        Address=>Addr,
        Write_Enable=>WR,
        Memory_valid_write=> memory_write_complete,
+       Memory_Block_Data_Valid => memory_data_valid,
        Data_Valid_L2=>L2_Data_Valid,
        Enable=>EN_C,
        clk =>clk,
@@ -142,7 +144,7 @@ L1_map: L1 port map
        );
 
 L2_map: L2 port map(
-       Data_In => Data_L1,
+       Data_In => DataIn,
        Memory_Block_In=>Memory_Block_In ,
        Address=>Addr,
        Write_Enable=> WR,
