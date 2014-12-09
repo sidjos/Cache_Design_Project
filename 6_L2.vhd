@@ -14,7 +14,7 @@ entity L2 is
        Address: in std_logic_vector ( 31 downto 0);
        Write_Enable: in std_logic;
        Memory_Block_Data_Valid: in std_logic;
-       Main_Memory_Write_Valid: 
+       Main_Memory_Write_Valid: in std_logic;
        Data_Valid_L2: out std_logic;
        Enable: in std_logic;
        clk  : in std_logic;
