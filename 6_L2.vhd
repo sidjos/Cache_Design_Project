@@ -65,16 +65,6 @@ component lru_counter_to_offset_s is
     Wr_o   : out std_logic_vector(3 downto 0)
     );
   end component;
-  
-component lru_counter_to_offset_s is
-  port ( 
-    Update : in std_logic;
-    Rd     : in std_logic_vector(3 downto 0);
-    Wr     : in std_logic_vector(3 downto 0);
-    Reset  : in std_logic;
-    Wr_o   : out std_logic_vector(3 downto 0)
-    );
-  end component;
 
     signal tag_L2 : std_logic_vector (21 downto 0);
     signal index_L2: std_logic_vector ( 1 downto 0);
