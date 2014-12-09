@@ -93,7 +93,7 @@ clockingL1_write: syncboss port map (clk, WrEn_L1_pc, Enable, WrEn_L1);
 
 
 --Write Miss/ signals for main memory
-Data_Out_64 <= L1_Block_Out;
+Data_Out_64 <= L1_Block_Out(511 downto 0);
 write_miss_mem_write_sig_map: and_gate port map (Write_Enable, current_dirty_status, Write_Main_Memory);
 
 
