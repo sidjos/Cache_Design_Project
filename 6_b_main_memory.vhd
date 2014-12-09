@@ -7,12 +7,12 @@ use work.eecs361.all;
 entity main_memory is
 	generic ( mem_file: string);
 	port (
-		clk:     		in std_logic; 
+		clk:     	in std_logic; 
 		reset:		in std_logic; 
-		address:		in std_logic_vector(31 downto 0); 
+		address:	in std_logic_vector(31 downto 0); 
 		L2_Miss: 	in std_logic;
 		main_write: 	in std_logic;
-		data_in: 	in std_logic_vector (31 downto 0);
+		data_in: 	in std_logic_vector (511 downto 0);
 		data_valid: 	out std_logic;
 		data_out_with_tag: 	out std_logic_vector(2069 downto 0)
 	);
@@ -28,12 +28,25 @@ signal not1,not11,and0,counter_minus_one_to_be_64,counter_reg_to_be_64,clk_with_
 
 begin
         
-   
-
-   --valid 
+ --Writing
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ --Reading  
+ 
+ --valid 
  --not11_map: not_gate port map (x=>counter_minus_one(1), z=>not11);
  --and22_map: and_gate port map (x=>counter_minus_one(6), y=>not11, z=>counter_minus_one_to_be_64);
- data_valid <= counter_minus_one_to_be_64;
+   data_valid <= counter_minus_one_to_be_64;
    
    not1_map: not_gate port map (x=>counter_minus_one(1), z=>not1);
    and2_map: and_gate port map (x=>counter_minus_one(6), y=>not1, z=>counter_minus_one_to_be_64);
@@ -43,10 +56,9 @@ begin
 
 
    --main memory 
-   mux6_map: 	mux_n generic map (n=>8) port map (sel=>main_write, src0(7 downto 2)=>counter_reg(5 downto 0), src0(1 downto 0)=>B"00", src1=>address(7 downto 0), z=>mux6);
-
+  
    syncram_map:	syncram generic map (mem_file => mem_file)
-				port map (clk=>clk_with_stop_and_trigger, cs=>'1', oe=>'1', we=>main_write, addr(31 downto 8)=>address(31 downto 8), addr(7 downto 0)=>mux6, din=>data_in, dout=>syncram0);
+				port map (clk=>clk_with_stop_and_trigger, cs=>'1', oe=>'1', we=>main_write, addr(31 downto 8)=>address(31 downto 8), addr(7 downto 0)=>B"00000000", din=>data_in, dout=>syncram0);
   
    --32 bits counter (positive edge)
    fulladder0_map:  fulladder_32 port map (cin=>'0', x=>counter_reg, y=>B"00000000000000000000000000000001", z=>counter);
