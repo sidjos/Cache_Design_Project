@@ -21,7 +21,7 @@ end main_memory;
 architecture structural of main_memory is
 
 signal mux0,mux1,mux2,mux3,mux4,shifter,mux00,mux11,mux22,mux33,mux44,clean_32bit,before_reg_out, data_out_sig, not_clean_32bit, data_out_sig_clean: std_logic_vector(2047 downto 0);
-signal mux6: std_logic_vector(9 downto 0);
+signal mux6: std_logic_vector(7 downto 0);
 signal syncram0,counter,counter_reg,counter_minus_one: std_logic_vector(31 downto 0);
 signal not1,not11,and0,counter_minus_one_to_be_64,counter_reg_to_be_64,clk_with_stop,clk_with_stop_and_trigger,not_clk_with_stop_and_trigger: std_logic;
 
@@ -43,10 +43,10 @@ begin
 
 
    --main memory 
-   mux6_map: 	mux_n generic map (n=>10) port map (sel=>main_write, src0(9 downto 2)=>counter_reg(7 downto 0), src0(1 downto 0)=>B"00", src1=>address(9 downto 0), z=>mux6);
+   mux6_map: 	mux_n generic map (n=>8) port map (sel=>main_write, src0(7 downto 2)=>counter_reg(5 downto 0), src0(1 downto 0)=>B"00", src1=>address(7 downto 0), z=>mux6);
 
    syncram_map:	syncram generic map (mem_file => mem_file)
-				port map (clk=>clk_with_stop_and_trigger, cs=>'1', oe=>'1', we=>main_write, addr(31 downto 10)=>address(31 downto 10), addr(9 downto 0)=>mux6, din=>data_in, dout=>syncram0);
+				port map (clk=>clk_with_stop_and_trigger, cs=>'1', oe=>'1', we=>main_write, addr(31 downto 8)=>address(31 downto 8), addr(7 downto 0)=>mux6, din=>data_in, dout=>syncram0);
   
    --32 bits counter (positive edge)
    fulladder0_map:  fulladder_32 port map (cin=>'0', x=>counter_reg, y=>B"00000000000000000000000000000001", z=>counter);

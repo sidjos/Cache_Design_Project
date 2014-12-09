@@ -150,7 +150,7 @@ L2_map: L2 port map(
 mainMemoryMap: main_memory generic map ( mem_file => mem_file )
 	port map (
 		clk=>    clk,
-		reset =>		EN_C,
+		reset =>		Reset_for_Main_Memory,
 		address =>	Addr, 
 		L2_Miss=>	L2_miss,
 		main_write=>		WR,
