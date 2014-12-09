@@ -10,22 +10,23 @@ entity L1 is
    port 
        (
        Data_In: in std_logic_vector ( 31 downto 0);
-       L2_Block_In : in std_logic_vector (511 downto 0);
+       L2_Block_In: in std_logic_vector (511 downto 0);
        Address: in std_logic_vector ( 31 downto 0);
        Write_Enable: in std_logic;
        Memory_Valid_Write: in std_logic;
        Memory_Block_Data_Valid : in std_logic;
        Data_Valid_L2: in std_logic;
        Enable: in std_logic;
-       clk  : in std_logic;
-       L1_Hit : out std_logic;
-       L1_Miss : out std_logic;
-       Data_Out: out std_logic_vector ( 31 downto 0);
+       clk: in std_logic;
+       L1_Hit: out std_logic;
+       L1_Miss: out std_logic;
        Dirty_Bit_Evict: out std_logic;
-       Data_Out_64: out std_logic_vector ( 511 downto 0)
+       Data_Out: out std_logic_vector ( 31 downto 0);
+       Data_Out_64: out std_logic_vector ( 511 downto 0);
+       Write_Main_Memory: out std_logic
        );
 end L1;
-       
+
 architecture structural of L1 is 
 
 component shifter_512 is
@@ -49,7 +50,7 @@ end component;
     signal index_L1: std_logic_vector ( 3 downto 0);
     signal offset_L1, offset_inv: std_logic_vector ( 5 downto 0);
     
-    signal WrEn_L1, WrEn_L1_pc, tag_match, tag_miss_dff, tag_miss, h0, h1, current_dirty_status, tag_match_dff: std_logic;
+    signal WrEn_L1, WrEn_L1_pc_d, WrEn_L1_pc, dirty_bit_comp, tag_match, tag_miss_dff, tag_miss, h0, h1, current_dirty_status, tag_match_dff: std_logic;
     signal L1_Block_Out, L1_Block_In, L1_hit_block_In, L1_Hit_Data_In, L2_Block_In_T  : std_logic_vector ( 534 downto 0);
     signal m0, m1, m2, m3, s1, s0, L1_hit_block_In_wdt, L1_Block_In_wdt, L1_Block_shifted : std_logic_vector ( 511 downto 0);
     
@@ -80,17 +81,20 @@ tag_match_store: dff port map (clk, tag_match, tag_match_dff);
 miss_dff_map: not_gate port map (tag_match_dff, tag_miss_dff);
 write_memory_map: and_gate port map (tag_miss_dff, Write_Enable);
 
---When to write
-hitmap0: and_gate port map ( tag_miss, Data_Valid_L2, h0);
-hitmap1: and_gate port map ( tag_match, Write_Enable, h1);
-hitmap2: or_gate port map ( h0, h1, WrEn_L1_pc);
+--When to write for read miss/ hit
+hitmap0: and_gate port map ( tag_miss, Data_Valid_L2, h0); -- read miss, write miss
+hitmap1: and_gate port map ( tag_match, Write_Enable, h1); -- write hit
+hitmap2: or_gate port map ( h0, h1, WrEn_L1_pc_d);
+hitmap3: not_gate port map(current_dirty_status, dirty_bit_comp);
+hitmap3: and_gate port map (WrEn_L1_pc_d, dirty_bit_comp, WrEn_L1_pc);
 
 --clocking write as well as making sure dirty bit is cleared first.
---clockingL1_write: dffr_a port map (clk, Enable, current_dirty_status, '0', WrEn_L1_pc, '1', WrEn_L1);
 clockingL1_write: syncboss port map (clk, WrEn_L1_pc, Enable, WrEn_L1);
---WrEn_L1 <= WrEn_L1_pc;
 
---WrEn_L1 means we have to write to L1
+--When to write for write miss
+
+
+
 
 --Write Hit
 
