@@ -12,7 +12,9 @@ entity tag_L2_compare is
 		input_3:	in std_logic_vector(2069 downto 0);
 		tag:		in std_logic_vector(21 downto 0);
 		output:		out std_logic_vector(2069 downto 0);
-		hit:		out std_logic
+		hit:		out std_logic;
+		comp:	out std_logic_vector(3 downto 0)
+		
 	);
 end tag_L2_compare;
 
@@ -26,7 +28,12 @@ begin
     	com0_map:	cmp_n generic map (n=>22)	 port map (a=>input_0(2069 downto 2048), b=>tag, a_eq_b=>com0);
     	com1_map:	cmp_n generic map (n=>22)	 port map (a=>input_1(2069 downto 2048), b=>tag, a_eq_b=>com1);
     	com2_map:	cmp_n generic map (n=>22)	 port map (a=>input_2(2069 downto 2048), b=>tag, a_eq_b=>com2);
-    	com3_map:	cmp_n generic map (n=>22)	 port map (a=>input_3(2069 downto 2048), b=>tag, a_eq_b=>com3);
+    	com3_map:	cmp_n generic map (n=>22)	 port map (a=>input_3(2069 downto 2048), b=>tag, a_eq_b=>com3); 
+
+	comp(0)<=com0;
+	comp(1)<=com1;
+	comp(2)<=com2;
+	comp(3)<=com3;
     	
     	--hit
     	or0_map:	or_gate 			 port map (x=>com0,y=>com1,z=>or0);
