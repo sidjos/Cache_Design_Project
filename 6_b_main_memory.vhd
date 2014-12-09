@@ -10,8 +10,8 @@ entity main_memory is
 		clk:     	in std_logic; 
 		reset:		in std_logic; 
 		address:	in std_logic_vector(31 downto 0); 
-		L2_Miss: 	in std_logic;
-		main_write: 	in std_logic;
+		L2_Miss: 	in std_logic; --reading
+		main_write: 	in std_logic; --writing
 		data_in: 	in std_logic_vector (511 downto 0);
 		data_valid_read: 	out std_logic;
 		data_valid_write: 	out std_logic;
