@@ -46,7 +46,7 @@ end component;
     signal index_L1: std_logic_vector ( 3 downto 0);
     signal offset_L1, offset_inv: std_logic_vector ( 5 downto 0);
     
-    signal WrEn_L1, WrEn_L1_pc, tag_match, tag_miss, h0, h1, current_dirty_status: std_logic;
+    signal WrEn_L1, WrEn_L1_pc, tag_match, tag_miss, h0, h1, current_dirty_status, tag_match_dff: std_logic;
     signal L1_Block_Out, L1_Block_In, L1_hit_block_In, L1_Hit_Data_In, L2_Block_In_T  : std_logic_vector ( 534 downto 0);
     signal m0, m1, m2, m3, s1, s0, L1_hit_block_In_wdt, L1_Block_In_wdt, L1_Block_shifted : std_logic_vector ( 511 downto 0);
     
@@ -99,10 +99,10 @@ or_map_L1: or_gate_n generic map (n=>512) port map (m3, m0, L1_hit_block_In_wdt)
 
 
 --Choose the right source for data-in for L1 memory with appropriate dirty bit set
-L2_Block_In_T <= '1' & tag_L1 & L2_Block_In;
-L1_Hit_Data_In <= '0' & tag_L1 & L1_hit_block_in_wdt;
-L1_data_in_mux_map: mux_n generic map (n => 535) port map ( tag_match, L2_Block_In_T, L1_Hit_Data_In, L1_Block_In);
-
+L2_Block_In_T <= '0' & tag_L1 & L2_Block_In;
+L1_Hit_Data_In <= '1' & tag_L1 & L1_hit_block_in_wdt;
+L1_data_in_mux_map: mux_n generic map (n => 535) port map ( tag_match_dff, L2_Block_In_T, L1_Hit_Data_In, L1_Block_In);
+tag_match_store: dff port map (clk, tag_match, tag_match_dff);
 
 --Get the 32 bit data from 64 byte data
 offset_inv_map: not_gate_n generic map ( n=> 6) port map (offset_L1, offset_inv);
