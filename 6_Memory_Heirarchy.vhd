@@ -58,6 +58,7 @@ component L2 is
        Address: in std_logic_vector ( 31 downto 0);
        Write_Enable: in std_logic;
        Memory_Block_Data_Valid: in std_logic;
+       Main_Memory_Write_Valid: in std_logic;
        Data_Valid_L2: out std_logic;
        Enable: in std_logic;
        clk: in std_logic;
@@ -149,6 +150,7 @@ L2_map: L2 port map(
        Address=>Addr,
        Write_Enable=> WR,
        Memory_Block_Data_Valid=>memory_data_valid,
+       Main_Memory_Write_Valid => memory_write_complete,
        Data_Valid_L2=>L2_Data_Valid,
        Enable=>EN_C,
        clk =>clk,

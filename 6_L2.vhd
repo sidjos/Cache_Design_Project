@@ -14,6 +14,7 @@ entity L2 is
        Address: in std_logic_vector ( 31 downto 0);
        Write_Enable: in std_logic;
        Memory_Block_Data_Valid: in std_logic;
+       Main_Memory_Write_Valid: in std_logic;
        Data_Valid_L2: out std_logic;
        Enable: in std_logic;
        clk  : in std_logic;
@@ -41,7 +42,8 @@ component tag_L2_compare is
 		input_3:	in std_logic_vector(2069 downto 0);
 		tag:		in std_logic_vector(21 downto 0);
 		output:		out std_logic_vector(2069 downto 0);
-		hit:		out std_logic
+		hit:		out std_logic;
+		comp:	out std_logic_vector(3 downto 0)
 	);
 end component;
 
@@ -54,13 +56,38 @@ port(
     );
 end component;
 
+component lru_counter_to_offset_s is
+  port ( 
+    Update : in std_logic;
+    Rd     : in std_logic_vector(3 downto 0);
+    Wr     : in std_logic_vector(3 downto 0);
+    Reset  : in std_logic;
+    Wr_o   : out std_logic_vector(3 downto 0)
+    );
+  end component;
+-- -- start To002 add the encoder
+-- component encoder_4to2_s is
+  -- port (
+    -- x_0, x_1, x_2, x_3    : in std_logic;
+    -- z0    : out std_logic;
+    -- z1    : out std_logic    
+  -- );
+-- end component;
+-- -- end To003
+
     signal tag_L2 : std_logic_vector (21 downto 0);
     signal index_L2: std_logic_vector ( 1 downto 0);
     signal offset_L2, offset_inv: std_logic_vector ( 7 downto 0);
     
-    signal WrEn_L2, WrEn_L2_s0_pc, WrEn_L2_s1_pc, WrEn_L2_s2_pc, WrEn_L2_s3_pc, WrEn_L2_s0, WrEn_L2_s1, WrEn_L2_s2, WrEn_L2_s3, L2_tag_match,L2_tag_miss, h0, h1 : std_logic;
+    signal set_read, set_written, set_to_be_written: std_logic_vector(3 downto 0);
+    
+    signal update, WrEn_L2, WrEn_L2_s0_pc, WrEn_L2_s1_pc, WrEn_L2_s2_pc, WrEn_L2_s3_pc, WrEn_L2_s0, WrEn_L2_s1, WrEn_L2_s2, WrEn_L2_s3, L2_tag_match,L2_tag_miss, h0, h1 : std_logic;
     signal L2_Block_Out_s0, L2_Block_Out_s1, L2_Block_Out_s2, L2_Block_Out_s3, tag, L2_block_Out, L2_Block_In  : std_logic_vector ( 2069 downto 0);
     signal b0, b1, b2, b3, m0, m1 : std_logic_vector (511 downto 0);
+--start To001    
+    signal WrEn_sync_s0, WrEn_sync_s1, WrEn_sync_s2, WrEn_sync_s3: std_logic;
+    -- signal en0_s, en1_s: std_logic;
+--end To001    
  --   signal m0, m1, m2, m3, s1, s0, L1_hit_block_In_wdt, L1_Block_In_wdt, L1_Block_shifted : std_logic_vector ( 511 downto 0);
     
     
@@ -85,7 +112,7 @@ L2_csram_s3: csram generic map ( INDEX_WIDTH => 2, BIT_WIDTH => 2070 )
 
 --Comparators
 
-L2_output_current: tag_L2_compare port map ( L2_Block_Out_s0, L2_Block_Out_s1, L2_Block_Out_s2, L2_Block_Out_s3, tag_L2, L2_block_Out, L2_tag_match);
+L2_output_current: tag_L2_compare port map ( L2_Block_Out_s0, L2_Block_Out_s1, L2_Block_Out_s2, L2_Block_Out_s3, tag_L2, L2_block_Out, L2_tag_match, set_read);
 miss_sig_map_L2: not_gate port map (L2_tag_match, L2_tag_miss);
 
 --output
@@ -99,7 +126,8 @@ b0 <= L2_Block_Out( 511 downto 0);
 b1 <= L2_Block_Out( 1023 downto 512);
 b2 <= L2_Block_Out( 1535 downto 1024);
 b3 <= L2_Block_Out( 2047 downto 1536);
- 
+
+
 muxL2_0: mux_n generic map (n=>512) port map ( offset_L2(6), b0, b1, m0);
 muxL2_1: mux_n generic map (n=>512) port map ( offset_L2(6), b2, b3, m1);
 muxL2_2: mux_n generic map (n=>512) port map ( offset_L2(7), m0, m1, L2_Data_Out);
@@ -109,19 +137,41 @@ muxL2_2: mux_n generic map (n=>512) port map ( offset_L2(7), m0, m1, L2_Data_Out
 hitmap0: and_gate port map ( L2_tag_miss, Memory_Block_Data_Valid, h0);
 hitmap1: and_gate port map ( L2_tag_match, Write_Enable, h1);
 hitmap2: or_gate port map ( h0, h1, WrEn_L2);
+--hitmap3: or_gate port map (WrEn_L2_pc, Main_Memory_Write_Valid, WrEn_L2);
 --WrEn_L2 means we have to write L2 memory
 
+
+--------------------------------
 --Where to write/ LRU Implementation
-WrEn_L2_s0_pc <= WrEn_L2;
---WrEn_L2_s0 <= WrEn_L2;
+--WrEn_L2_s0_pc <= WrEn_L2;
+
+--set_written <= "0000";
+
+WrEn_L2_s0_pc <= set_to_be_written(0);
+WrEn_L2_s1_pc <= set_to_be_written(1);
+WrEn_L2_s2_pc <= set_to_be_written(2);
+WrEn_L2_s3_pc <= set_to_be_written(3);
+
+update_LRU_map: or_gate port map (L2_tag_match, WrEn_L2, update);
+LRU_Map: lru_counter_to_offset_s port map ( update, set_read, set_to_be_written, Enable, set_to_be_written);
+
+--Initialize LRU here and comment the above line. Whatever output the LRU is giving, AND it with
+--WrEn_L2 and we will have the write signals for the four sets. 
+--------------------------------
+
 
 --Clocking Write
 
-clockingL2_write0: syncboss port map (clk, WrEn_L2_s0_pc, Enable, WrEn_L2_s0);
-clockingL2_write1: syncboss port map (clk, WrEn_L2_s1_pc, Enable, WrEn_L2_s1);
-clockingL2_write2: syncboss port map (clk, WrEn_L2_s2_pc, Enable, WrEn_L2_s2);
-clockingL2_write3: syncboss port map (clk, WrEn_L2_s3_pc, Enable, WrEn_L2_s3);
-
+clockingL2_write0: syncboss port map (clk, WrEn_L2_s0_pc, Enable, WrEn_sync_s0);
+clockingL2_write1: syncboss port map (clk, WrEn_L2_s1_pc, Enable, WrEn_sync_s1);
+clockingL2_write2: syncboss port map (clk, WrEn_L2_s2_pc, Enable, WrEn_sync_s2);
+clockingL2_write3: syncboss port map (clk, WrEn_L2_s3_pc, Enable, WrEn_sync_s3);
+-- start To 004
+and_WrEn_s0: and_gate port map(WrEn_sync_s0, L2_tag_miss, WrEn_L2_s0);
+and_WrEn_s1: and_gate port map(WrEn_sync_s1, L2_tag_miss, WrEn_L2_s1);
+and_WrEn_s2: and_gate port map(WrEn_sync_s2, L2_tag_miss, WrEn_L2_s2);
+and_WrEn_s3: and_gate port map(WrEn_sync_s3, L2_tag_miss, WrEn_L2_s3);
+-- End To 004
 --What to write
 L2_Block_In <= Memory_Block_In;
 
