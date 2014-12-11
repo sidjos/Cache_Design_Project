@@ -104,14 +104,13 @@ port(
 end component;
 
 signal L2_Block_Out, Data_L1: std_logic_vector ( 511 downto 0);
-signal Write_Main_Memory, Ready_Sig_Comp, Memory_Write_Complete, Dirty_Bit_Evict,EN_C, Reset_for_Main_Memory, Ready_Sig, L2_Data_Valid, memory_data_valid, L2_Hit, L1_Hit, L1_Miss, L2_Miss, L1_Hit_sync, L1_Miss_sync, L2_Miss_sync, L2_Hit_sync: std_logic; 
+signal Write_Main_Memory, L1_Hit_Store, Ready_Sig_Comp, Memory_Write_Complete, Dirty_Bit_Evict,EN_C, Reset_for_Main_Memory, Ready_Sig, L2_Data_Valid, memory_data_valid, L2_Hit, L1_Hit, L1_Miss, L2_Miss, L1_Hit_sync, L1_Miss_sync, L2_Miss_sync, L2_Hit_sync: std_logic; 
 signal Memory_Block_In: std_logic_vector (2069 downto 0);
 
 
 begin
 
-
-ready_signal_map: syncboss port map (clk, L1_Hit, EN_C, Ready_Sig);
+ready_signal_map: syncboss port map (clk, L1_Hit_Store,EN_C , Ready_Sig);
 Ready <= Ready_Sig; 
 ready_comp_map: not_gate port map (Reset_for_Main_Memory, Ready_Sig_Comp);
 
@@ -122,6 +121,7 @@ L2_Miss_Count_s: syncboss port map (Ready_Sig_Comp, L2_Miss, EN_C, L2_Miss_sync)
 
 enable_comp: not_gate port map (EN, EN_C);
 Reset_Main_MeM_MAP: or_gate port map (rst, Ready_Sig, Reset_for_Main_Memory);
+L1_Hit_Store_Map: dffr_a port map (clk, Ready_Sig, '0', '0', L1_Hit, '1', L1_Hit_Store);
 
 L1_Hit_Counter: Counter_S port map (L1_Hit, Ready_Sig_Comp, rst, l1_hit_cnt);
 L1_Miss_Counter: Counter_S port map (L1_Miss, Ready_Sig_Comp, rst, l1_miss_cnt);
