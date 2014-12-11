@@ -65,6 +65,15 @@ component lru_counter_to_offset_s is
     Wr_o   : out std_logic_vector(3 downto 0)
     );
   end component;
+-- -- start To002 add the encoder
+-- component encoder_4to2_s is
+  -- port (
+    -- x_0, x_1, x_2, x_3    : in std_logic;
+    -- z0    : out std_logic;
+    -- z1    : out std_logic    
+  -- );
+-- end component;
+-- -- end To003
 
     signal tag_L2 : std_logic_vector (21 downto 0);
     signal index_L2: std_logic_vector ( 1 downto 0);
@@ -75,6 +84,10 @@ component lru_counter_to_offset_s is
     signal update, WrEn_L2, WrEn_L2_s0_pc, WrEn_L2_s1_pc, WrEn_L2_s2_pc, WrEn_L2_s3_pc, WrEn_L2_s0, WrEn_L2_s1, WrEn_L2_s2, WrEn_L2_s3, L2_tag_match,L2_tag_miss, h0, h1 : std_logic;
     signal L2_Block_Out_s0, L2_Block_Out_s1, L2_Block_Out_s2, L2_Block_Out_s3, tag, L2_block_Out, L2_Block_In  : std_logic_vector ( 2069 downto 0);
     signal b0, b1, b2, b3, m0, m1 : std_logic_vector (511 downto 0);
+--start To001    
+    signal WrEn_sync_s0, WrEn_sync_s1, WrEn_sync_s2, WrEn_sync_s3: std_logic;
+    -- signal en0_s, en1_s: std_logic;
+--end To001    
  --   signal m0, m1, m2, m3, s1, s0, L1_hit_block_In_wdt, L1_Block_In_wdt, L1_Block_shifted : std_logic_vector ( 511 downto 0);
     
     
@@ -113,7 +126,8 @@ b0 <= L2_Block_Out( 511 downto 0);
 b1 <= L2_Block_Out( 1023 downto 512);
 b2 <= L2_Block_Out( 1535 downto 1024);
 b3 <= L2_Block_Out( 2047 downto 1536);
- 
+
+
 muxL2_0: mux_n generic map (n=>512) port map ( offset_L2(6), b0, b1, m0);
 muxL2_1: mux_n generic map (n=>512) port map ( offset_L2(6), b2, b3, m1);
 muxL2_2: mux_n generic map (n=>512) port map ( offset_L2(7), m0, m1, L2_Data_Out);
@@ -148,11 +162,16 @@ LRU_Map: lru_counter_to_offset_s port map ( update, set_read, set_to_be_written,
 
 --Clocking Write
 
-clockingL2_write0: syncboss port map (clk, WrEn_L2_s0_pc, Enable, WrEn_L2_s0);
-clockingL2_write1: syncboss port map (clk, WrEn_L2_s1_pc, Enable, WrEn_L2_s1);
-clockingL2_write2: syncboss port map (clk, WrEn_L2_s2_pc, Enable, WrEn_L2_s2);
-clockingL2_write3: syncboss port map (clk, WrEn_L2_s3_pc, Enable, WrEn_L2_s3);
-
+clockingL2_write0: syncboss port map (clk, WrEn_L2_s0_pc, Enable, WrEn_sync_s0);
+clockingL2_write1: syncboss port map (clk, WrEn_L2_s1_pc, Enable, WrEn_sync_s1);
+clockingL2_write2: syncboss port map (clk, WrEn_L2_s2_pc, Enable, WrEn_sync_s2);
+clockingL2_write3: syncboss port map (clk, WrEn_L2_s3_pc, Enable, WrEn_sync_s3);
+-- start To 004
+and_WrEn_s0: and_gate port map(WrEn_sync_s0, L2_tag_miss, WrEn_L2_s0);
+and_WrEn_s1: and_gate port map(WrEn_sync_s1, L2_tag_miss, WrEn_L2_s1);
+and_WrEn_s2: and_gate port map(WrEn_sync_s2, L2_tag_miss, WrEn_L2_s2);
+and_WrEn_s3: and_gate port map(WrEn_sync_s3, L2_tag_miss, WrEn_L2_s3);
+-- End To 004
 --What to write
 L2_Block_In <= Memory_Block_In;
 
