@@ -1,0 +1,163 @@
+# Fill the caches.
+# No set associate support in L2 is required.
+00000000 / 57253a01;
+00000004 / 3129efff;
+# Counters now:
+# L1 Cache
+# 	Hit Count:	0
+# 	Miss Count:	2
+# 	Evict Count:	0
+# L2 Cache
+# 	Hit Count:	0
+# 	Miss Count:	2
+# 	Evict Count:	0
+
+# Do more reads to fill the caches.
+# Set associate support in L2 is required.
+00000008 / 761c1352;
+0000000c / 54553e82;
+00000010 / 216748e5;
+00000014 / 5735a64e;
+# Counters now:
+# L1 Cache
+# 	Hit Count:	0
+# 	Miss Count:	6
+# 	Evict Count:	0
+# L2 Cache
+# 	Hit Count:	0
+# 	Miss Count:	6
+# 	Evict Count:	0
+
+# Do more reads that missing in L2 because of subblocks.
+# Address's tag is in cache, however its subblock is not in cache.
+00000018 / 14a81192;
+0000001c / 68d46bd7;
+# Counters now:
+# L1 Cache
+# 	Hit Count:	0
+# 	Miss Count:	8
+# 	Evict Count:	0
+# L2 Cache
+# 	Hit Count:	0
+# 	Miss Count:	8
+# 	Evict Count:	0
+
+# Read previous blocks. L1 hits. No counter changes in L2.
+00000020 / 57253a01;
+00000024 / 5a09a103;
+# Counters now:
+# L1 Cache
+# 	Hit Count:	2
+# 	Miss Count:	8
+# 	Evict Count:	0
+# L2 Cache
+# 	Hit Count:	0
+# 	Miss Count:	8
+# 	Evict Count:	0
+
+# Replace blocks in L1. L2 do not do replacement.
+00000028 / 31d3557b;
+0000002c / 7290a30a;
+# Counters now:
+# L1 Cache
+# 	Hit Count:	2
+# 	Miss Count:	10
+# 	Evict Count:	2
+# L2 Cache
+# 	Hit Count:	0
+# 	Miss Count:	10
+# 	Evict Count:	0
+
+# L1 miss, L2 hit.
+00000030 / 57531186;
+00000034 / 1c2b5f18;
+# Counters now:
+# L1 Cache
+# 	Hit Count:	2
+# 	Miss Count:	12
+# 	Evict Count:	4
+# L2 Cache
+# 	Hit Count:	2
+# 	Miss Count:	10
+# 	Evict Count:	0
+
+# L2 replacement.
+00000038 / 22081850;
+0000003c / 7926fee5;
+00000040 / 10451c9f;
+00000044 / 77f30b88;
+# Counters now:
+# L1 Cache
+# 	Hit Count:	2
+# 	Miss Count:	16
+# 	Evict Count:	6
+# L2 Cache
+# 	Hit Count:	2
+# 	Miss Count:	14
+# 	Evict Count:	1
+
+# Check L2 LRU.
+00000048 / 04536ade;
+# Counters now:
+# L1 Cache
+# 	Hit Count:	2
+# 	Miss Count:	17
+# 	Evict Count:	7
+# L2 Cache
+# 	Hit Count:	2
+# 	Miss Count:	15
+# 	Evict Count:	2
+0000004c / 4ce3d5f6;
+# Counters now:
+# L1 Cache
+# 	Hit Count:	2
+# 	Miss Count:	18
+# 	Evict Count:	8
+# L2 Cache
+# 	Hit Count:	2
+# 	Miss Count:	16
+# 	Evict Count:	3
+
+# L1 Cache
+# - Index 0:
+# - Index 1:
+# 	[fa3a5]    7  3e8e9440 10 
+# - Index 2:
+# 	[fa3a6]    4  3e8e9880 10 
+# - Index 3:
+# 	[fa3a5]   13  3e8e94c0 10 
+# - Index 4:
+# 	[fa3a2]   18  3e8e8900 10 
+# - Index 5:
+# 	[fa3a3]   14  3e8e8d40 10 
+# - Index 6:
+# 	[fa3a4]    5  3e8e9180 10 
+# - Index 7:
+# 	[fa3a4]   19  3e8e91c0 10 
+# - Index 8:
+# - Index 9:
+# - Index 10:
+# - Index 11:
+# - Index 12:
+# 	[fa3a1]   17  3e8e8700 10 
+# - Index 13:
+# 	[fa3a3]   20  3e8e8f40 10 
+# - Index 14:
+# - Index 15:
+# 	[fa3a0]   16  3e8e83c0 10 
+# 
+# L2 Cache
+# - Index 0:
+# 	[1f4748]    9  3e8e9000 00  3e8e9040 00  3e8e9080 00  3e8e90c0 10 
+# 	[1f474a]   11  3e8e9400 00  3e8e9440 10  3e8e9480 00  3e8e94c0 10 
+# 	[1f474c]    4  3e8e9800 00  3e8e9840 00  3e8e9880 10  3e8e98c0 00 
+# - Index 1:
+# 	[1f4740]   10  3e8e8100 00  3e8e8140 10  3e8e8180 00  3e8e81c0 00 
+# 	[1f4741]   14  3e8e8300 00  3e8e8340 00  3e8e8380 00  3e8e83c0 10 
+# 	[1f4743]   15  3e8e8700 10  3e8e8740 00  3e8e8780 00  3e8e87c0 00 
+# 	[1f4744]   16  3e8e8900 10  3e8e8940 00  3e8e8980 00  3e8e89c0 00 
+# 	[1f4745]   13  3e8e8b00 00  3e8e8b40 10  3e8e8b80 00  3e8e8bc0 00 
+# 	[1f4746]   12  3e8e8d00 00  3e8e8d40 10  3e8e8d80 00  3e8e8dc0 00 
+# 	[1f4747]   18  3e8e8f00 00  3e8e8f40 10  3e8e8f80 00  3e8e8fc0 00 
+# 	[1f4748]   17  3e8e9100 00  3e8e9140 00  3e8e9180 00  3e8e91c0 10 
+# 

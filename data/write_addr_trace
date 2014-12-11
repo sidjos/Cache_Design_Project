@@ -1,0 +1,149 @@
+# Fill the caches with writes.
+00000000 / be8e94f0;
+00000004 / be8e8d6c;
+# Counters now:
+# L1 Cache
+# 	Hit Count:	0
+# 	Miss Count:	2
+# 	Evict Count:	0
+# L2 Cache
+# 	Hit Count:	0
+# 	Miss Count:	2
+# 	Evict Count:	0
+
+# Do more writes to fill the caches.
+# Set associate support in L2 is required.
+00000008 / be8e95e8;
+0000000c / be8e98b0;
+00000010 / be8e91b0;
+00000014 / be8e8f60;
+# Counters now:
+# L1 Cache
+# 	Hit Count:	0
+# 	Miss Count:	6
+# 	Evict Count:	0
+# L2 Cache
+# 	Hit Count:	0
+# 	Miss Count:	6
+# 	Evict Count:	0
+
+# Check the blocks are written.
+# They are all L1 hits.
+00000018 / 3e8e94c4;
+0000001c / 3e8e8d40;
+# Counters now:
+# L1 Cache
+# 	Hit Count:	2
+# 	Miss Count:	6
+# 	Evict Count:	0
+# L2 Cache
+# 	Hit Count:	0
+# 	Miss Count:	6
+# 	Evict Count:	0
+
+# Do more writes that evicts the dirty blocks.
+00000020 / be8ea0c0;
+00000024 / be8e8948;
+# Counters now:
+# L1 Cache
+# 	Hit Count:	2
+# 	Miss Count:	8
+# 	Evict Count:	2
+# L2 Cache
+# 	Hit Count:	0
+# 	Miss Count:	8
+# 	Evict Count:	0
+
+# Check the blocks are written back to L2.
+00000028 / 3e8e94d8;
+0000002c / 3e8e8d7c;
+# Counters now:
+# L1 Cache
+# 	Hit Count:	2
+# 	Miss Count:	10
+# 	Evict Count:	4
+# L2 Cache
+# 	Hit Count:	2
+# 	Miss Count:	8
+# 	Evict Count:	0
+
+# Evict block in L2.
+00000030 / 3e8e81f8;
+00000034 / be8ea114;
+00000038 / be8ea3c4;
+0000003c / be8e9d64;
+# Counters now:
+# L1 Cache
+# 	Hit Count:	2
+# 	Miss Count:	14
+# 	Evict Count:	6
+# L2 Cache
+# 	Hit Count:	2
+# 	Miss Count:	12
+# 	Evict Count:	1
+
+# Check the evicted block is written back.
+00000040 / 3e8e95c0;
+# Counters now:
+# L1 Cache
+# 	Hit Count:	2
+# 	Miss Count:	15
+# 	Evict Count:	7
+# L2 Cache
+# 	Hit Count:	2
+# 	Miss Count:	13
+# 	Evict Count:	2
+
+# Evict a L1 block which is not cached by L2.
+00000044 / 3e8e8198;
+# Counters now:
+# L1 Cache
+# 	Hit Count:	2
+# 	Miss Count:	16
+# 	Evict Count:	8
+# L2 Cache
+# 	Hit Count:	2
+# 	Miss Count:	14
+# 	Evict Count:	2
+
+# L1 Cache
+# - Index 0:
+# - Index 1:
+# - Index 2:
+# 	[fa3a6]    4  3e8e9880 11 
+# - Index 3:
+# 	[fa3a5]   11  3e8e94c0 10 
+# - Index 4:
+# 	[fa3a8]   14  3e8ea100 11 
+# - Index 5:
+# 	[fa3a7]   16  3e8e9d40 11 
+# - Index 6:
+# 	[fa3a0]   18  3e8e8180 10 
+# - Index 7:
+# 	[fa3a5]   17  3e8e95c0 10 
+# - Index 8:
+# - Index 9:
+# - Index 10:
+# - Index 11:
+# - Index 12:
+# - Index 13:
+# 	[fa3a3]    6  3e8e8f40 11 
+# - Index 14:
+# - Index 15:
+# 	[fa3a8]   15  3e8ea3c0 11 
+# 
+# L2 Cache
+# - Index 0:
+# 	[1f4750]    8  3e8ea000 00  3e8ea040 00  3e8ea080 00  3e8ea0c0 10 
+# 	[1f474a]   12  3e8e9400 00  3e8e9440 00  3e8e9480 00  3e8e94c0 10 
+# 	[1f474c]    4  3e8e9800 00  3e8e9840 00  3e8e9880 10  3e8e98c0 00 
+# - Index 1:
+# 	[1f4740]   22  3e8e8100 00  3e8e8140 00  3e8e8180 10  3e8e81c0 10 
+# 	[1f4744]   10  3e8e8900 00  3e8e8940 10  3e8e8980 00  3e8e89c0 00 
+# 	[1f4746]   14  3e8e8d00 00  3e8e8d40 10  3e8e8d80 00  3e8e8dc0 00 
+# 	[1f4747]    6  3e8e8f00 00  3e8e8f40 10  3e8e8f80 00  3e8e8fc0 00 
+# 	[1f474a]   20  3e8e9500 00  3e8e9540 00  3e8e9580 00  3e8e95c0 10 
+# 	[1f474e]   19  3e8e9d00 00  3e8e9d40 10  3e8e9d80 00  3e8e9dc0 00 
+# 	[1f4750]   17  3e8ea100 10  3e8ea140 00  3e8ea180 00  3e8ea1c0 00 
+# 	[1f4751]   18  3e8ea300 00  3e8ea340 00  3e8ea380 00  3e8ea3c0 10 
+# 
