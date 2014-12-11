@@ -24,23 +24,20 @@ architecture structural of syncboss is
       );
     end component;
     
-    signal q0, q0b, q1, q1b, d0, d1, s0, s1, clk_ns : std_logic;
+    signal q0, q0b, q1, q1b, d0, d1, s0, s1 : std_logic;
     
     begin
         
-        -- test putting not gate to inverse the clk signal
-        m00: not_gate port map(clk, clk_ns);
         m0: and_gate_3to1_s port map (q0b, q1, b, s0);
         m1: and_gate_3to1_s  port map (q0, q1b, b, s1);
         m2: or_gate port map ( s0, s1, d0);
-        m3: dffr_a port map ( clk_ns, Enable, '0','0', d0, '1',q0);
-        -- m3: dff port map ( clk, d0, q0);
+--        m3: dffr_a port map ( clk, Enable, '0','0', d0, '1',q0);
+        m3: dff port map ( clk, d0, q0);
         m4: and_gate_3to1_s port map (q0b, q1b, b, d1);
-        m6: dffr_a port map ( clk_ns, Enable, '0','0',d1,'1', q1);
-        -- m6: dff port map ( clk,d1, q1);
+--        m6: dffr_a port map ( clk, Enable, '0','0',d1,'1', q1);
+        m6: dff port map ( clk,d1, q1);
         m7: and_gate port map (q0b, q1, sync);
         m8: not_gate port map (q0, q0b);
         m9: not_gate port map (q1, q1b);
         
 end structural;
-        

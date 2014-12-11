@@ -14,6 +14,7 @@ component memory_hierarchy is
     clk : in std_logic;
     EN : in std_logic;
     WR : in std_logic;
+    rst : in std_logic;
     Addr : in std_logic_vector(31 downto 0);
     DataIn : in std_logic_vector(31 downto 0);
     Ready : out std_logic;
@@ -49,6 +50,7 @@ begin
       clk => clk,
       EN => en,
       WR => wr,
+      rst => rst,
       Addr => addr,
       DataIn => datain,
       Ready => ready,

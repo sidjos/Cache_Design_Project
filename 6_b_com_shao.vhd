@@ -22,6 +22,7 @@ architecture structural of tag_L2_compare is
 
 signal mux0,mux1,mux2: std_logic_vector(2069 downto 0);
 signal com0,com1,com2,com3,or0,or1,or2: std_logic;
+signal selectSid: std_logic_vector (1 downto 0);
 
 begin
     	--compare tag
@@ -35,16 +36,19 @@ begin
 	comp(2)<=com2;
 	comp(3)<=com3;
     	
+sid0: or_gate port map (com1, com3, selectSid(0));
+sid1: or_gate port map (com2, com3, selectSid(1));
+
+
     	--hit
     	or0_map:	or_gate 			 port map (x=>com0,y=>com1,z=>or0);
     	or1_map:	or_gate 			 port map (x=>com2,y=>com3,z=>or1);
     	or2_map:	or_gate 			 port map (x=>or1,y=>or0,z=>hit);
     	
     	--output 
-	mux0_map:	mux_n generic map (n=>2070)	 port map (sel=>com1, src0=>input_0, src1=>input_1, z=>mux0);
-	mux1_map:	mux_n generic map (n=>2070)	 port map (sel=>com2, src0=>input_2, src1=>input_3, z=>mux1);
-	and0_map:	or_gate			 	 port map (x=>com2, y=>com3, z=>or2);
-	mux2_map:	mux_n generic map (n=>2070)	 port map (sel=>or2, src0=>mux0, src1=>mux1, z=>output);
+	mux0_map:	mux_n generic map (n=>2070)	 port map (sel=>selectSid(0), src0=>input_0, src1=>input_1, z=>mux0);
+	mux1_map:	mux_n generic map (n=>2070)	 port map (sel=>selectSid(0), src0=>input_2, src1=>input_3, z=>mux1);
+	mux2_map:	mux_n generic map (n=>2070)	 port map (sel=>selectSid(1), src0=>mux0, src1=>mux1, z=>output);
 	
 end architecture structural;
 

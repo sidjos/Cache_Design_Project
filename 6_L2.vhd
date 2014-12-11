@@ -162,15 +162,15 @@ LRU_Map: lru_counter_to_offset_s port map ( update, set_read, set_to_be_written,
 
 --Clocking Write
 
-clockingL2_write0: syncboss port map (clk, WrEn_L2_s0_pc, Enable, WrEn_sync_s0);
-clockingL2_write1: syncboss port map (clk, WrEn_L2_s1_pc, Enable, WrEn_sync_s1);
-clockingL2_write2: syncboss port map (clk, WrEn_L2_s2_pc, Enable, WrEn_sync_s2);
-clockingL2_write3: syncboss port map (clk, WrEn_L2_s3_pc, Enable, WrEn_sync_s3);
+clockingL2_write0: syncboss port map (clk, WrEn_sync_s0, Enable, WrEn_L2_s0);
+clockingL2_write1: syncboss port map (clk, WrEn_sync_s1, Enable, WrEn_L2_s1);
+clockingL2_write2: syncboss port map (clk, WrEn_sync_s2, Enable, WrEn_L2_s2);
+clockingL2_write3: syncboss port map (clk, WrEn_sync_s3, Enable, WrEn_L2_s3);
 -- start To 004
-and_WrEn_s0: and_gate port map(WrEn_sync_s0, L2_tag_miss, WrEn_L2_s0);
-and_WrEn_s1: and_gate port map(WrEn_sync_s1, L2_tag_miss, WrEn_L2_s1);
-and_WrEn_s2: and_gate port map(WrEn_sync_s2, L2_tag_miss, WrEn_L2_s2);
-and_WrEn_s3: and_gate port map(WrEn_sync_s3, L2_tag_miss, WrEn_L2_s3);
+and_WrEn_s0: and_gate port map(WrEn_L2_s0_pc, WrEn_L2, WrEn_sync_s0);
+and_WrEn_s1: and_gate port map(WrEn_L2_s1_pc, WrEn_L2, WrEn_sync_s1);
+and_WrEn_s2: and_gate port map(WrEn_L2_s2_pc, WrEn_L2, WrEn_sync_s2);
+and_WrEn_s3: and_gate port map(WrEn_L2_s3_pc, WrEn_L2, WrEn_sync_s3);
 -- End To 004
 --What to write
 L2_Block_In <= Memory_Block_In;

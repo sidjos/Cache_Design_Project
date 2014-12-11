@@ -14,6 +14,7 @@ entity memory_hierarchy is
     clk : in std_logic;
     EN : in std_logic;
     WR : in std_logic;
+    rst : in std_logic;
     Addr : in std_logic_vector(31 downto 0);
     DataIn : in std_logic_vector(31 downto 0);
     Ready : out std_logic;
@@ -117,13 +118,14 @@ L1_Miss_Count_s: syncboss port map (clk, L1_Miss, L1_Miss_sync);
 L2_Hit_Count_s: syncboss port map (clk, L2_Hit, L2_Hit_sync);
 L2_Miss_Count_s: syncboss port map (clk, L2_Miss, L2_Miss_sync);
 
-Reset_Main_MeM_MAP: or_gate port map (EN_C, Ready_Sig, Reset_for_Main_Memory);
+enable_comp: not_gate port map (EN, EN_C);
+Reset_Main_MeM_MAP: or_gate port map (rst, Ready_Sig, Reset_for_Main_Memory);
 
 L1_Hit_Counter: Counter_S port map ('1', L1_Hit_sync, '0', l1_hit_cnt);
 L1_Miss_Counter: Counter_S port map ('1', L1_Miss_sync, '0', l1_miss_cnt);
 L1_Evict_Counter: Counter_S port map ('1', Dirty_Bit_Evict, '0', l1_evict_cnt);
 
-enable_comp: not_gate port map (EN, EN_C);
+
 
 L1_map: L1 port map
        (
