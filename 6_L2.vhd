@@ -62,6 +62,7 @@ component lru_counter_to_offset_s is
     Rd     : in std_logic_vector(3 downto 0);
     Wr     : in std_logic_vector(3 downto 0);
     Reset  : in std_logic;
+    Clock  : in std_logic;
     Wr_o   : out std_logic_vector(3 downto 0)
     );
   end component;
@@ -153,7 +154,7 @@ WrEn_L2_s2_pc <= set_to_be_written(2);
 WrEn_L2_s3_pc <= set_to_be_written(3);
 
 update_LRU_map: or_gate port map (L2_tag_match, WrEn_L2, update);
-LRU_Map: lru_counter_to_offset_s port map ( update, set_read, set_to_be_written, Enable, set_to_be_written);
+LRU_Map: lru_counter_to_offset_s port map ( update, set_read, set_to_be_written, Enable, clk, set_to_be_written);
 
 --Initialize LRU here and comment the above line. Whatever output the LRU is giving, AND it with
 --WrEn_L2 and we will have the write signals for the four sets. 
