@@ -7,5 +7,6 @@ work/
 !*.do
 !*.pdf
 !*.jpg
+!*.zip
 !.gitignore
 !.tiff
